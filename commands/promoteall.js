@@ -3,13 +3,13 @@ dotenv.config();
 
 export default {
   name: "promoteall",
-  description: "𝙿𝚛𝚘𝚖𝚘𝚝𝚎 𝚝𝚘𝚞𝚜 𝚕𝚎𝚜 𝚖𝚎𝚖𝚋𝚛𝚎𝚜 𝚍𝚞 𝚐𝚛𝚘𝚞𝚙𝚎",
+  description: "Promouvoir tous les membres du groupe",
 
   async execute(sock, message, args) {
     const { from, reply } = message;
 
     if (!from.endsWith("@g.us")) {
-      return await reply("❌ 𝙲𝚘𝚖𝚖𝚊𝚗𝚍𝚎 𝚛é𝚜𝚎𝚛𝚟é𝚎 𝚊𝚞𝚡 𝚐𝚛𝚘𝚞𝚙𝚎𝚜.");
+      return await reply("❌ Commande réservée aux groupes.");
     }
 
     try {
@@ -24,7 +24,7 @@ export default {
       const ownerJid = ownerNumber ? `${ownerNumber}@s.whatsapp.net` : null;
 
       if (!ownerJid) {
-        return await reply("⚠️ 𝙽𝚞𝚖é𝚛𝚘 𝚍𝚞 𝚙𝚛𝚘𝚙𝚛𝚒é𝚝𝚊𝚒𝚛𝚎 𝚗𝚘𝚗 𝚌𝚘𝚗𝚏𝚒𝚐𝚞𝚛é.");
+        return await reply("⚠️ Numéro du propriétaire non configuré.");
       }
 
       const isAdmin = p =>
@@ -38,14 +38,14 @@ export default {
         .map(p => p.id);
 
       if (targets.length === 0) {
-        return await reply("✅ 𝚃𝚘𝚞𝚜 𝚕𝚎𝚜 𝚖𝚎𝚖𝚋𝚛𝚎𝚜 𝚜𝚘𝚗𝚝 𝚍é𝚓à 𝚊𝚍𝚖𝚒𝚗𝚜.");
+        return await reply("✅ Tous les membres sont déjà admins.");
       }
 
       await sock.groupParticipantsUpdate(from, targets, "promote");
 
       const text =
-        `✅ 𝙿𝚛𝚘𝚖𝚘𝚝𝚒𝚘𝚗 𝚛é𝚞𝚜𝚜𝚒𝚎\n` +
-        `𝙼𝚎𝚖𝚋𝚛𝚎𝚜 𝚙𝚛𝚘𝚖𝚞𝚜 : ${targets.length}`;
+        `*_✅ Promotion réussie\n` +
+        `Membres promus : ${targets.length}_*`;
 
       await sock.sendMessage(
         from,
@@ -55,7 +55,7 @@ export default {
 
     } catch (err) {
       console.error("promoteall error:", err);
-      await reply("❌ 𝙴𝚛𝚛𝚎𝚞𝚛 𝚕𝚘𝚛𝚜 𝚍𝚎 𝚕’𝚎𝚡é𝚌𝚞𝚝𝚒𝚘𝚗.");
+      await reply("❌ Erreur lors de l'exécution.");
     }
   }
 };

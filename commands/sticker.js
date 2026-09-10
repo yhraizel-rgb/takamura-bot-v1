@@ -12,7 +12,7 @@ async function streamToBuffer(stream) {
 
 export default {
   name: "sticker",
-  description: "Transformer une image/vidéo en sceau démoniaque (sticker)",
+  description: "Transformer une image/vidéo en sticker",
 
   async execute(sock, message) {
     const { from, raw, reply, pushName } = message;
@@ -22,16 +22,16 @@ export default {
       const mediaMsg = quoted || raw.message;
 
       const type = mediaMsg.imageMessage ? "imageMessage" : mediaMsg.videoMessage ? "videoMessage" : null;
-      if (!type) return await reply("𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ⚠️ Réponds ou envoie une image ou vidéo.");
+      if (!type) return await reply("⚠️ Réponds ou envoie une image ou vidéo.");
 
       const stream = await downloadContentFromMessage(mediaMsg[type], type === "imageMessage" ? "image" : "video");
       const buffer = await streamToBuffer(stream);
 
-      const sticker = new Sticker(buffer, { pack: "ROK", author: pushName || "XD", type: StickerTypes.FULL, quality: 80 });
+      const sticker = new Sticker(buffer, { pack: "TAKAMURA", author: pushName || "Bot", type: StickerTypes.FULL, quality: 80 });
       await sock.sendMessage(from, { sticker: await sticker.build() }, { quoted: raw });
 
     } catch (err) {
-      await reply(`𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ❌ ${err.message}`);
+      await reply(`❌ ${err.message}`);
     }
   }
 };

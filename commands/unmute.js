@@ -1,17 +1,17 @@
 export default {
   name: "unmute",
-  description: "🔊 Unmute the group (everyone can send messages)",
-  
+  description: "Réactiver la parole pour tous dans le groupe",
+
   async execute(sock, message, args) {
     const { from, reply, isGroup } = message;
-    if (!isGroup) return await reply("❌ This command works only in groups");
+    if (!isGroup) return await reply("❌ Cette commande fonctionne uniquement dans les groupes");
 
     try {
-      await sock.groupSettingUpdate(from, "not_announcement"); // everyone can send
-      await reply("🔊 𝙶𝚛𝚘𝚞𝚙 unmuted: everyone can send messages");
+      await sock.groupSettingUpdate(from, "not_announcement"); // tout le monde peut écrire
+      await reply("🔊 Groupe réactivé : tout le monde peut écrire");
     } catch (e) {
       console.error("Unmute error:", e);
-      await reply("❌ Cannot unmute the group");
+      await reply("❌ Impossible de réactiver le groupe");
     }
   }
 };

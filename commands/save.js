@@ -17,7 +17,7 @@ export default {
 
       if (!quoted) {
         return await reply(
-          "⚠️ 𝚁𝚎́𝚙𝚘𝚗𝚍𝚜 𝚊̀ 𝚞𝚗 𝚖𝚎𝚜𝚜𝚊𝚐𝚎, 𝚖𝚎́𝚍𝚒𝚊 𝚘𝚞 𝚜𝚝𝚒𝚌𝚔𝚎𝚛 𝚊𝚟𝚎𝚌 .𝚜𝚊𝚟𝚎"
+          "⚠️ Réponds à un message, média ou sticker avec .save"
         );
       }
 
@@ -28,16 +28,14 @@ export default {
         const text =
           quoted.conversation ||
           quoted.extendedTextMessage?.text ||
-          "⚡ 𝙼𝚎𝚜𝚜𝚊𝚐𝚎 𝚟𝚒𝚍𝚎";
+          "⚡ Message vide";
 
         await sock.sendMessage(selfJid, {
           text:
-            "📜 𝙼𝚎𝚜𝚜𝚊𝚐𝚎 𝚂𝚊𝚞𝚟𝚎𝚐𝚊𝚛𝚍𝚎́\n\n" +
-            "⚔️ 𝙲𝚘𝚗𝚝𝚎𝚗𝚞 : " +
-            text,
+            "*_📜 Message sauvegardé\n\n✏️ Contenu : " + text + "_*",
         });
 
-        await reply("✅ 𝙻𝚎 𝚝𝚎𝚡𝚝𝚎 𝚊 𝚎́𝚝𝚎́ 𝚜𝚊𝚞𝚟𝚎𝚐𝚊𝚛𝚍𝚎́.");
+        await reply("✅ Le texte a été sauvegardé.");
         return;
       }
 
@@ -52,9 +50,9 @@ export default {
       let content = {};
 
       if (type === "imageMessage") {
-        content = { image: buffer, caption: "🖼️ 𝙸𝚖𝚊𝚐𝚎 𝚜𝚊𝚞𝚟𝚎𝚐𝚊𝚛𝚍𝚎́𝚎" };
+        content = { image: buffer, caption: "*_🖼️ Image sauvegardée_*" };
       } else if (type === "videoMessage") {
-        content = { video: buffer, caption: "🎥 𝚅𝚒𝚍𝚎́𝚘 𝚜𝚊𝚞𝚟𝚎𝚐𝚊𝚛𝚍𝚎́𝚎" };
+        content = { video: buffer, caption: "*_🎥 Vidéo sauvegardée_*" };
       } else if (type === "audioMessage") {
         content = {
           audio: buffer,
@@ -70,7 +68,7 @@ export default {
         content = { sticker: buffer };
       } else {
         await reply(
-          "❌ 𝙲𝚎 𝚝𝚢𝚙𝚎 𝚍𝚎 𝚖𝚎́𝚍𝚒𝚊 𝚗’𝚎𝚜𝚝 𝚙𝚊𝚜 𝚜𝚞𝚙𝚙𝚘𝚛𝚝𝚎́."
+          "❌ Ce type de média n'est pas supporté."
         );
         return;
       }
@@ -78,11 +76,11 @@ export default {
       // 📥 Envoi privé
       await sock.sendMessage(selfJid, content);
 
-      await reply("✅ 𝙻𝚎 𝚖𝚎́𝚍𝚒𝚊 𝚊 𝚎́𝚝𝚎́ 𝚜𝚊𝚞𝚟𝚎𝚐𝚊𝚛𝚍𝚎́ 𝚊𝚟𝚎𝚌 𝚜𝚞𝚌𝚌𝚎̀𝚜.");
+      await reply("✅ Le média a été sauvegardé avec succès.");
     } catch (err) {
       console.error("❌ SAVE error:", err);
       await reply(
-        "❌ 𝙸𝚖𝚙𝚘𝚜𝚜𝚒𝚋𝚕𝚎 𝚍𝚎 𝚜𝚊𝚞𝚟𝚎𝚐𝚊𝚛𝚍𝚎𝚛 𝚕𝚎 𝚌𝚘𝚗𝚝𝚎𝚗𝚞."
+        "❌ Impossible de sauvegarder le contenu."
       );
     }
   }

@@ -11,7 +11,7 @@ export default {
 
     if (!ctxInfo || !ctxInfo.quotedMessage?.imageMessage) {
       return await reply(
-        "𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ⚠️ Réponds à une image pour changer la photo de profil du bot."
+        "⚠️ Réponds à une image pour changer la photo de profil du bot."
       );
     }
 
@@ -26,10 +26,10 @@ export default {
       // Mettre à jour la photo de profil
       await sock.updateProfilePicture(sock.user.id, buffer);
 
-      await reply("𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ✅ La photo de profil du bot a été mise à jour !");
+      await reply("✅ La photo de profil du bot a été mise à jour !");
     } catch (err) {
       console.error("❌ Erreur setpp :", err);
-      await reply("𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ❌ Impossible de changer la photo de profil.");
+      await reply("❌ Impossible de changer la photo de profil.");
     }
   }
 };

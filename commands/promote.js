@@ -1,12 +1,12 @@
 // commands/promote.js
 export default {
   name: "promote",
-  description: "Promote user to admin",
+  description: "Promouvoir un membre en admin",
 
   async execute(sock, message, args) {
     const { from, reply, isGroup, raw } = message;
 
-    if (!isGroup) return await reply("❌ Group only");
+    if (!isGroup) return await reply("❌ Réservé aux groupes");
 
     try {
       const mentioned = raw.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
@@ -14,18 +14,18 @@ export default {
 
       let targets = [...mentioned];
       if (quotedUser && !targets.includes(quotedUser)) targets.push(quotedUser);
-      if (targets.length === 0) return await reply("⚠️ Mention or reply a user to promote");
+      if (targets.length === 0) return await reply("⚠️ Mentionne ou réponds à un utilisateur à promouvoir");
 
       await sock.groupParticipantsUpdate(from, targets, "promote");
 
       await sock.sendMessage(from, {
-        text: `✅ 𝙿𝚛𝚘𝚖𝚘𝚝𝚎𝚍 ${targets.map(t => `@${t.split("@")[0]}`).join(", ")} 𝚝𝚘 𝚊𝚍𝚖𝚒𝚗.`,
+        text: `*_✅ ${targets.map(t => `@${t.split("@")[0]}`).join(", ")} promu(s) admin._*`,
         mentions: targets
       });
 
     } catch (err) {
       console.error("❌ Promote error:", err);
-      await reply("❌ Impossible to promote. Check my permissions.");
+      await reply("❌ Impossible de promouvoir. Vérifie mes permissions.");
     }
   }
 };

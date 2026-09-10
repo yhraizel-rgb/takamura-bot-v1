@@ -23,7 +23,7 @@ export default {
     try {
       const quoted = raw.message?.extendedTextMessage?.contextInfo?.quotedMessage || raw.message;
       const type = quoted.imageMessage ? "image" : quoted.videoMessage ? "video" : quoted.audioMessage ? "audio" : null;
-      if (!type) return await reply("𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ⚠️ Réponds à un média.");
+      if (!type) return await reply("⚠️ Réponds à un média.");
 
       const stream = await downloadContentFromMessage(quoted[`${type}Message`], type);
       const buffer = await streamToBuffer(stream);
@@ -40,9 +40,9 @@ export default {
       const url = (await axios.post("https://catbox.moe/user/api.php", form, { headers: form.getHeaders() })).data;
       fs.unlinkSync(path);
 
-      await reply(`𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 🔗 ${url}`);
+      await reply(`🔗 ${url}`);
     } catch (err) {
-      await reply(`𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ❌ ${err.message}`);
+      await reply(`❌ ${err.message}`);
     }
   }
 };
