@@ -13,7 +13,6 @@ export default {
     );
 
     const chatType = isGroup ? "Groupe" : "Privé";
-    const userName = sender ? sender.split("@")[0] : "Invité";
     const prefix = bot?.config?.prefix || ".";
 
     const menuText = `
@@ -21,60 +20,59 @@ export default {
 │       *TAKAMURA BOT V1*       │
 └─────────────────────────────┘
 
-*Utilisateur* : ${userName}
-*Chat*        : ${chatType}
-*Préfixe*     : ${prefix}
+Chat    : ${chatType}
+Préfixe : ${prefix}
 
 ┌─────────────── GESTION DE GROUPE ───────────────┐
-│ add
-│ demote
-│ demoteall
-│ gpp
-│ kick
-│ kickall
-│ left
-│ link
-│ mute
-│ promote
-│ promoteall
-│ purge
-│ resetlink
-│ unmute
+│ \`\`\`add\`\`\`
+│ \`\`\`demote\`\`\`
+│ \`\`\`demoteall\`\`\`
+│ \`\`\`gpp\`\`\`
+│ \`\`\`kick\`\`\`
+│ \`\`\`kickall\`\`\`
+│ \`\`\`left\`\`\`
+│ \`\`\`link\`\`\`
+│ \`\`\`mute\`\`\`
+│ \`\`\`promote\`\`\`
+│ \`\`\`promoteall\`\`\`
+│ \`\`\`purge\`\`\`
+│ \`\`\`resetlink\`\`\`
+│ \`\`\`unmute\`\`\`
 └───────────────────────────────────────────────┘
 
 ┌─────────────── TÉLÉCHARGEMENTS ───────────────┐
-│ img
-│ save
-│ url
-│ vv
+│ \`\`\`img\`\`\`
+│ \`\`\`save\`\`\`
+│ \`\`\`url\`\`\`
+│ \`\`\`vv\`\`\`
 └───────────────────────────────────────────────┘
 
 ┌─────────────── UTILITAIRES ───────────────┐
-│ ping
-│ owner
+│ \`\`\`ping\`\`\`
+│ \`\`\`owner\`\`\`
 └───────────────────────────────────────────────┘
 
 ┌─────────────── MODÉRATION ───────────────┐
-│ autorecording
-│ autotyping
-│ autoread
-│ autoreact
-│ welcome
-│ bye
+│ \`\`\`autorecording\`\`\`
+│ \`\`\`autotyping\`\`\`
+│ \`\`\`autoread\`\`\`
+│ \`\`\`autoreact\`\`\`
+│ \`\`\`welcome\`\`\`
+│ \`\`\`bye\`\`\`
 └───────────────────────────────────────────────┘
 
 ┌─────────────── MEDIA ───────────────┐
-│ photo
-│ setpp
-│ take
-│ pp
-│ sticker
+│ \`\`\`photo\`\`\`
+│ \`\`\`setpp\`\`\`
+│ \`\`\`take\`\`\`
+│ \`\`\`pp\`\`\`
+│ \`\`\`sticker\`\`\`
 └───────────────────────────────────────────────┘
 
 ┌─────────────── TAGS ───────────────┐
-│ tag
-│ tagadmin
-│ tagall
+│ \`\`\`tag\`\`\`
+│ \`\`\`tagadmin\`\`\`
+│ \`\`\`tagall\`\`\`
 └───────────────────────────────────────────────┘
 
 ┌─────────────────────────────┐
