@@ -13,26 +13,33 @@ export default {
     );
 
     const chatType = isGroup ? "Groupe" : "Privé";
+    const userName = sender ? sender.split("@")[0] : "Invité";
     const prefix = bot?.config?.prefix || ".";
 
     const menuText = `
 ┌─────────────────────────────┐
-│       *TAKAMURA BOT V1*       │
+│         *MR.SAMY BOT*         │
 └─────────────────────────────┘
 
-Chat    : ${chatType}
-Préfixe : ${prefix}
+*Utilisateur* : ${userName}
+*Chat*        : ${chatType}
+*Préfixe*     : ${prefix}
 
 ┌─────────────── GESTION DE GROUPE ───────────────┐
 │ add
 │ demote
 │ demoteall
+│ desc
 │ gpp
+│ infosgroups
+│ invite
 │ kick
 │ kickall
 │ left
 │ link
+│ manga
 │ mute
+│ online
 │ promote
 │ promoteall
 │ purge
@@ -41,18 +48,35 @@ Préfixe : ${prefix}
 └───────────────────────────────────────────────┘
 
 ┌─────────────── TÉLÉCHARGEMENTS ───────────────┐
+│ apk
+│ down-url
 │ img
 │ save
+│ telegram-sticker
+│ tiktok
+│ toaudio
 │ url
 │ vv
 └───────────────────────────────────────────────┘
 
 ┌─────────────── UTILITAIRES ───────────────┐
+│ ai
+│ news
+│ weather
+│ checkban
+│ country
+│ delete
+│ device
+│ dico
+│ infos
+│ meteo
 │ ping
 │ owner
 └───────────────────────────────────────────────┘
 
 ┌─────────────── MODÉRATION ───────────────┐
+│ block
+│ unblock
 │ autorecording
 │ autotyping
 │ autoread
@@ -70,13 +94,14 @@ Préfixe : ${prefix}
 └───────────────────────────────────────────────┘
 
 ┌─────────────── TAGS ───────────────┐
+│ principal
 │ tag
 │ tagadmin
 │ tagall
 └───────────────────────────────────────────────┘
 
 ┌─────────────────────────────┐
-│      *Dev par takamura*      │
+│   *Développé par MR._SAMY TOUT MIGNON *     │
 └─────────────────────────────┘
 `;
 
