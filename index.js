@@ -15,6 +15,8 @@ import {
   delay
 } from "@whiskeysockets/baileys";
 
+import { reactProcessing } from "./lib/style.js";
+
 const app = express();
 const PORT = process.env.PORT || 80;
 
@@ -56,32 +58,12 @@ async function loadCommands() {
   const folder = "./commands";
   await fs.ensureDir(folder);
 
-  // Enregistre une commande individuelle dans la Map (utilisée pour les
-  // exports uniques ET pour chaque élément d'un export groupé/array).
-  function registerCommand(cmd, file) {
-    if (cmd?.name && typeof cmd.execute === "function") {
-      commands.set(cmd.name.toLowerCase(), cmd);
-      if (Array.isArray(cmd.aliases)) {
-        for (const alias of cmd.aliases) commands.set(alias.toLowerCase(), cmd);
-      }
-    } else {
-      console.log(chalk.yellow(`[CMD] ${file} : export invalide, ignoré.`));
-    }
-  }
-
   if (fs.existsSync(folder)) {
     for (const file of fs.readdirSync(folder).filter(f => f.endsWith(".js"))) {
       try {
-        const mod = await import(`./commands/${file}?v=${Date.now()}`);
-        const exported = mod.default;
-
-        // Fichier fusionné : export default = tableau de commandes.
-        if (Array.isArray(exported)) {
-          for (const cmd of exported) registerCommand(cmd, file);
-        }
-        // Fichier classique : export default = une seule commande.
-        else {
-          registerCommand(exported, file);
+        const cmd = await import(`./commands/${file}?v=${Date.now()}`);
+        if (cmd.default?.name && typeof cmd.default.execute === "function") {
+          commands.set(cmd.default.name.toLowerCase(), cmd.default);
         }
       } catch (e) {
         console.log(chalk.red(`[CMD] ${file} : ${e.message}`));
@@ -181,6 +163,10 @@ async function startBot(inputNumber) {
 
       if (cmdName && bot.commands.has(cmdName)) {
         try {
+          await reactProcessing(sock, msg);
+
+          const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
+
           await bot.commands.get(cmdName).execute(
             sock,
             {
@@ -188,8 +174,8 @@ async function startBot(inputNumber) {
               from: remoteJid,
               sender: participant,
               isGroup: remoteJid.endsWith("@g.us"),
-              // Réponses des commandes formatées en gras-italique (style WhatsApp : _*texte*_)
-              reply: t => sock.sendMessage(remoteJid, { text: `_*${t}*_` }),
+              quoted,
+              reply: t => sock.sendMessage(remoteJid, { text: t }),
               bots
             },
             args
