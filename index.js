@@ -247,6 +247,11 @@ async function startBot(inputNumber) {
       const bot = bots.get(number);
       if (!bot) return;
 
+      // 📌 Message cité (reply), extrait une bonne fois pour toutes ici
+      // et transmis à chaque commande via message.quoted.
+      const quoted =
+        msg.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
+
       if (text && text.startsWith(bot.config.prefix)) {
         const prefix = bot.config.prefix;
         const args = text.slice(prefix.length).trim().split(/\s+/);
@@ -273,6 +278,7 @@ async function startBot(inputNumber) {
                 from: remoteJid,
                 sender: participant,
                 isGroup: remoteJid.endsWith("@g.us"),
+                quoted,
                 // Toutes les réponses des commandes sont automatiquement
                 // mises en forme en gras + italique (style WhatsApp).
                 reply: t => sock.sendMessage(remoteJid, { text: `*_${t}_*` }),
