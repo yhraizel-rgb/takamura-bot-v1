@@ -56,12 +56,32 @@ async function loadCommands() {
   const folder = "./commands";
   await fs.ensureDir(folder);
 
+  // Enregistre une commande individuelle dans la Map (utilisée pour les
+  // exports uniques ET pour chaque élément d'un export groupé/array).
+  function registerCommand(cmd, file) {
+    if (cmd?.name && typeof cmd.execute === "function") {
+      commands.set(cmd.name.toLowerCase(), cmd);
+      if (Array.isArray(cmd.aliases)) {
+        for (const alias of cmd.aliases) commands.set(alias.toLowerCase(), cmd);
+      }
+    } else {
+      console.log(chalk.yellow(`[CMD] ${file} : export invalide, ignoré.`));
+    }
+  }
+
   if (fs.existsSync(folder)) {
     for (const file of fs.readdirSync(folder).filter(f => f.endsWith(".js"))) {
       try {
-        const cmd = await import(`./commands/${file}?v=${Date.now()}`);
-        if (cmd.default?.name && typeof cmd.default.execute === "function") {
-          commands.set(cmd.default.name.toLowerCase(), cmd.default);
+        const mod = await import(`./commands/${file}?v=${Date.now()}`);
+        const exported = mod.default;
+
+        // Fichier fusionné : export default = tableau de commandes.
+        if (Array.isArray(exported)) {
+          for (const cmd of exported) registerCommand(cmd, file);
+        }
+        // Fichier classique : export default = une seule commande.
+        else {
+          registerCommand(exported, file);
         }
       } catch (e) {
         console.log(chalk.red(`[CMD] ${file} : ${e.message}`));
@@ -168,7 +188,8 @@ async function startBot(inputNumber) {
               from: remoteJid,
               sender: participant,
               isGroup: remoteJid.endsWith("@g.us"),
-              reply: t => sock.sendMessage(remoteJid, { text: t }),
+              // Réponses des commandes formatées en gras-italique (style WhatsApp : _*texte*_)
+              reply: t => sock.sendMessage(remoteJid, { text: `_*${t}*_` }),
               bots
             },
             args
