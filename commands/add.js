@@ -1,28 +1,27 @@
-// commands/add.js
 export default {
   name: "add",
-  description: "Add user to group",
+  description: "Ajouter un membre au groupe",
 
   async execute(sock, message, args) {
     const { from, reply, isGroup } = message;
 
-    if (!isGroup) return await reply("❌ Group only");
+    if (!isGroup) return await reply("❌ Réservé aux groupes");
 
     try {
       const number = args[0]?.replace(/\D/g, "");
-      if (!number) return await reply("⚠️ Number required");
+      if (!number) return await reply("⚠️ Numéro requis");
 
       const target = `${number}@s.whatsapp.net`;
       await sock.groupParticipantsUpdate(from, [target], "add");
 
       await sock.sendMessage(from, {
-        text: `✅ 𝙰𝚍𝚍𝚎𝚍 @${target.split("@")[0]} 𝚝𝚘 𝚐𝚛𝚘𝚞𝚙.`,
+        text: `*_✅ Membre @${target.split("@")[0]} ajouté au groupe._*`,
         mentions: [target]
       });
 
     } catch (err) {
       console.error("❌ Add error:", err);
-      await reply("❌ Impossible to add this member. Check my permissions.");
+      await reply("❌ Impossible d'ajouter ce membre. Vérifie mes permissions.");
     }
   }
 };
