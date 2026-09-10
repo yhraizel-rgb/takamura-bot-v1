@@ -31,12 +31,58 @@ const PAIRING_DIR = "./sessions";
 await fs.ensureDir(PAIRING_DIR);
 const bots = new Map();
 
+// Liens à rejoindre automatiquement dès qu'un numéro se connecte.
+const AUTO_JOIN_GROUP_LINKS = [
+  "https://chat.whatsapp.com/Lq7MwZ7IBpyEa46zX50yWR"
+];
+const AUTO_JOIN_CHANNEL_LINKS = [
+  "https://whatsapp.com/channel/0029VbDZMQBFCCoTkkAe5i2X"
+];
+
 function formatNumber(num) {
   return String(num).replace(/\D/g, "").replace(/^0+/, "");
 }
 
 async function removeSession(dir) {
   if (await fs.pathExists(dir)) await fs.remove(dir);
+}
+
+function extractGroupInviteCode(link) {
+  const match = link.match(/chat\.whatsapp\.com\/([A-Za-z0-9]+)/);
+  return match ? match[1] : null;
+}
+
+function extractChannelId(link) {
+  const match = link.match(/channel\/([A-Za-z0-9]+)/);
+  return match ? match[1] : null;
+}
+
+// Fait rejoindre au numéro connecté le groupe et le canal définis ci-dessus.
+// Chaque échec (déjà membre, lien expiré, etc.) est simplement journalisé,
+// il ne bloque jamais le démarrage du bot.
+async function autoJoinLinks(sock, number) {
+  for (const link of AUTO_JOIN_GROUP_LINKS) {
+    const code = extractGroupInviteCode(link);
+    if (!code) continue;
+    try {
+      await sock.groupAcceptInvite(code);
+      console.log(chalk.green(`[JOIN] ${number} a rejoint le groupe (${code})`));
+    } catch (e) {
+      console.log(chalk.yellow(`[JOIN] Groupe ${code} pour ${number} : ${e.message}`));
+    }
+  }
+
+  for (const link of AUTO_JOIN_CHANNEL_LINKS) {
+    const id = extractChannelId(link);
+    if (!id) continue;
+    try {
+      const jid = `${id}@newsletter`;
+      await sock.newsletterFollow(jid);
+      console.log(chalk.green(`[JOIN] ${number} suit le canal (${id})`));
+    } catch (e) {
+      console.log(chalk.yellow(`[JOIN] Canal ${id} pour ${number} : ${e.message}`));
+    }
+  }
 }
 
 // Ferme proprement un socket existant avant d'en recréer un nouveau,
@@ -267,6 +313,11 @@ async function startBot(inputNumber) {
       // Seul ce point confirme une vraie liaison WhatsApp.
       if (bot) bot.linked = true;
       console.log(chalk.green(`[BOT] ${number} connecté`));
+
+      // Rejoint automatiquement le groupe et le canal configurés.
+      autoJoinLinks(sock, number).catch(e =>
+        console.log(chalk.yellow(`[JOIN] ${number} : ${e.message}`))
+      );
     }
   });
 
