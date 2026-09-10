@@ -3,29 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TAKAMURA BOT V1</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>TAKAMURA BOT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #050505;
-    --bg-elev: #0d0d0f;
-    --surface: #121214;
-    --surface-hover: #17171a;
-    --border: #1f1f23;
-    --border-strong: #2a2a30;
-    --text: #f5f5f7;
-    --text-muted: #8a8a94;
-    --text-dim: #5a5a63;
-    --accent: #6366f1;
-    --accent-hover: #7c7ff2;
-    --accent-soft: rgba(99,102,241,0.12);
-    --success: #22c55e;
-    --success-soft: rgba(34,197,94,0.12);
-    --danger: #ef4444;
-    --danger-soft: rgba(239,68,68,0.12);
+    --bg: #0C0D10;
+    --bg-elev: #131519;
+    --surface: #191B20;
+    --surface-hover: #202329;
+    --border: #26292F;
+    --border-strong: #383C44;
+    --text: #EDEEF0;
+    --text-muted: #9498A0;
+    --text-dim: #5B5F68;
+
+    --accent: #F0A93D;
+    --accent-hover: #F5BB60;
+    --accent-ink: #241703;
+    --accent-soft: rgba(240,169,61,0.13);
+
+    --success: #43C98A;
+    --success-soft: rgba(67,201,138,0.12);
+    --danger: #E5595E;
+    --danger-soft: rgba(229,89,94,0.12);
+
+    --radius-lg: 20px;
     --radius: 12px;
     --radius-sm: 8px;
-    --sidebar-w: 260px;
+    --sidebar-w: 264px;
+
+    --font-display: 'Space Grotesk', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,19 +44,19 @@
     height: 100%;
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    font-size: 14px;
-    line-height: 1.55;
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
 
-  ::selection { background: var(--accent); color: #fff; }
+  ::selection { background: var(--accent); color: var(--accent-ink); }
 
-  /* ============ LAYOUT ============ */
-  .app {
-    display: flex;
-    min-height: 100vh;
-  }
+  h1, h2, h3, h4 { font-family: var(--font-display); }
+
+  code { font-family: var(--font-mono); }
+
+  .app { display: flex; min-height: 100vh; }
 
   /* ============ SIDEBAR ============ */
   .sidebar {
@@ -55,7 +65,7 @@
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    padding: 22px 16px;
+    padding: 24px 14px;
     position: fixed;
     top: 0; left: 0; bottom: 0;
     z-index: 40;
@@ -65,48 +75,41 @@
   .brand {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 6px 10px 22px;
+    gap: 11px;
+    padding: 4px 10px 24px;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 18px;
+    margin-bottom: 20px;
   }
   .brand-mark {
-    width: 34px; height: 34px;
-    border-radius: 9px;
-    background: linear-gradient(135deg, var(--accent), #4338ca);
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--accent);
     display: grid;
     place-items: center;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-display);
     font-weight: 700;
-    font-size: 15px;
-    color: #fff;
+    font-size: 16px;
+    color: var(--accent-ink);
     flex-shrink: 0;
   }
-  .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
-  .brand-title { font-size: 13px; font-weight: 700; letter-spacing: .5px; }
-  .brand-version {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.25; }
+  .brand-title { font-family: var(--font-display); font-size: 14.5px; font-weight: 600; letter-spacing: .1px; }
+  .brand-version { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-dim); }
 
-  .nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav { display: flex; flex-direction: column; gap: 1px; flex: 1; }
   .nav-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1.4px;
+    font-size: 11px;
     color: var(--text-dim);
-    padding: 14px 12px 8px;
-    font-weight: 600;
+    padding: 16px 12px 7px;
+    font-weight: 500;
   }
 
   .nav-item {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 11px;
-    padding: 9px 12px;
+    gap: 12px;
+    padding: 10px 12px 10px 16px;
     border-radius: var(--radius-sm);
     color: var(--text-muted);
     cursor: pointer;
@@ -120,26 +123,23 @@
     transition: background .15s, color .15s;
   }
   .nav-item:hover { background: var(--surface-hover); color: var(--text); }
-  .nav-item.active {
-    background: var(--accent-soft);
-    color: var(--text);
+  .nav-item.active { background: var(--accent-soft); color: var(--text); }
+  .nav-item::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 2px;
+    border-radius: 2px;
+    background: transparent;
   }
-  .nav-item.active .nav-dot { background: var(--accent); }
-
-  .nav-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--border-strong);
-    flex-shrink: 0;
-    transition: background .15s;
-  }
+  .nav-item.active::before { background: var(--accent); }
 
   .sidebar-footer {
     border-top: 1px solid var(--border);
-    padding-top: 16px;
+    padding: 16px 12px 4px;
     font-size: 11px;
     color: var(--text-dim);
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -155,34 +155,23 @@
   }
 
   /* ============ MAIN ============ */
-  .main {
-    flex: 1;
-    margin-left: var(--sidebar-w);
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
+  .main { flex: 1; margin-left: var(--sidebar-w); display: flex; flex-direction: column; min-width: 0; }
 
   .topbar {
-    height: 64px;
+    height: 66px;
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 32px;
+    padding: 0 34px;
     position: sticky;
     top: 0;
-    background: rgba(5,5,5,0.85);
-    backdrop-filter: blur(12px);
+    background: rgba(12,13,16,0.86);
+    backdrop-filter: blur(14px);
     z-index: 30;
   }
-  .topbar h2 { font-size: 15px; font-weight: 600; letter-spacing: .2px; }
-  .topbar-meta {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: .5px;
-  }
+  .topbar h2 { font-size: 15.5px; font-weight: 600; letter-spacing: .1px; }
+  .topbar-meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
 
   .menu-toggle {
     display: none;
@@ -193,15 +182,12 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
     margin-right: 14px;
+    font-size: 16px;
   }
 
-  .content {
-    padding: 36px 32px 80px;
-    max-width: 900px;
-    width: 100%;
-  }
+  .content { padding: 40px 34px 90px; max-width: 900px; width: 100%; }
 
-  .view { display: none; animation: fade .3s ease; }
+  .view { display: none; animation: fade .35s ease; }
   .view.active { display: block; }
 
   @keyframes fade {
@@ -209,29 +195,18 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* ============ TYPOGRAPHY ============ */
-  .page-title {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: -0.4px;
-    margin-bottom: 6px;
-  }
-  .page-sub {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 32px;
-  }
+  .page-title { font-size: 30px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 8px; }
+  .page-sub { color: var(--text-muted); font-size: 14.5px; margin-bottom: 34px; max-width: 62ch; }
 
   .section-title {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1.4px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
     color: var(--text-dim);
-    font-weight: 600;
-    margin: 32px 0 14px;
+    font-weight: 500;
+    margin: 34px 0 14px;
   }
 
-  /* ============ CARDS ============ */
+  /* ============ CARDS — varied radius / weight by hierarchy ============ */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -239,47 +214,40 @@
     padding: 22px;
     margin-bottom: 16px;
   }
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
+  .card.hero {
+    border-radius: var(--radius-lg);
+    background: linear-gradient(165deg, var(--surface) 0%, var(--bg-elev) 100%);
+    border-color: var(--border-strong);
+    padding: 28px;
   }
-  .card h3 { font-size: 15px; font-weight: 600; }
-  .card p { color: var(--text-muted); font-size: 13.5px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .card h3 { font-size: 15.5px; font-weight: 600; }
+  .card p { color: var(--text-muted); font-size: 13.8px; }
 
-  .grid-2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
   /* ============ FORM ============ */
-  .field { margin-bottom: 14px; }
+  .field { margin-bottom: 16px; }
   .field label {
     display: block;
-    font-size: 12px;
-    font-weight: 500;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
     color: var(--text-muted);
-    margin-bottom: 7px;
-    letter-spacing: .3px;
+    margin-bottom: 8px;
   }
   .field input {
     width: 100%;
     background: var(--bg-elev);
     border: 1px solid var(--border-strong);
     border-radius: var(--radius-sm);
-    padding: 11px 14px;
+    padding: 12px 14px;
     color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13.5px;
+    font-family: var(--font-mono);
+    font-size: 14px;
     outline: none;
     transition: border .15s, box-shadow .15s;
   }
-  .field input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
+  .field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .field input::placeholder { color: var(--text-dim); }
 
   /* ============ BUTTONS ============ */
@@ -288,36 +256,26 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 18px;
+    padding: 11px 20px;
     border-radius: var(--radius-sm);
-    font-family: inherit;
-    font-size: 13.5px;
+    font-family: var(--font-body);
+    font-size: 13.8px;
     font-weight: 600;
     cursor: pointer;
     border: 1px solid transparent;
     transition: background .15s, border .15s, transform .1s;
-    letter-spacing: .2px;
   }
   .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
 
-  .btn-primary {
-    background: var(--accent);
-    color: #fff;
-  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
   .btn-primary:hover { background: var(--accent-hover); }
 
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    border-color: var(--border-strong);
-  }
+  .btn-ghost { background: transparent; color: var(--text-muted); border-color: var(--border-strong); }
   .btn-ghost:hover { color: var(--text); border-color: var(--text-dim); }
 
-  .btn-success {
-    background: var(--success);
-    color: #041a0d;
-  }
-  .btn-success:hover { filter: brightness(1.1); }
+  .btn-success { background: var(--success); color: #04180F; }
+  .btn-success:hover { filter: brightness(1.08); }
 
   /* ============ RESULT ============ */
   .result {
@@ -325,17 +283,16 @@
     margin-top: 16px;
     padding: 14px 16px;
     border-radius: var(--radius-sm);
-    font-size: 13.5px;
+    font-size: 13.8px;
     font-weight: 500;
     border: 1px solid transparent;
     animation: fade .3s ease;
   }
   .result.show { display: block; }
-  .result.info { background: var(--accent-soft); border-color: var(--accent); color: #c7c8fc; }
-  .result.ok { background: var(--success-soft); border-color: var(--success); color: #86efac; }
-  .result.err { background: var(--danger-soft); border-color: var(--danger); color: #fca5a5; }
+  .result.info { background: var(--accent-soft); border-color: var(--accent); color: #F7D9A0; }
+  .result.ok { background: var(--success-soft); border-color: var(--success); color: #9CE8C4; }
+  .result.err { background: var(--danger-soft); border-color: var(--danger); color: #F6ABAE; }
   .result code {
-    font-family: 'JetBrains Mono', monospace;
     background: rgba(0,0,0,0.35);
     padding: 2px 8px;
     border-radius: 6px;
@@ -344,14 +301,14 @@
     color: #fff;
   }
 
-  /* ============ FEATURE / COMMAND LIST ============ */
-  .list { display: flex; flex-direction: column; gap: 8px; }
+  /* ============ LIST ============ */
+  .list { display: flex; flex-direction: column; gap: 6px; }
 
   .list-item {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 14px 16px;
+    gap: 16px;
+    padding: 15px 16px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm);
@@ -360,34 +317,29 @@
   .list-item:hover { border-color: var(--border-strong); background: var(--surface-hover); }
 
   .cmd {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12.5px;
     background: var(--accent-soft);
-    color: #a5a8fc;
+    color: var(--accent);
     padding: 4px 10px;
     border-radius: 6px;
     flex-shrink: 0;
-    border: 1px solid rgba(99,102,241,0.25);
-    min-width: 96px;
+    border: 1px solid rgba(240,169,61,0.28);
+    min-width: 100px;
     text-align: center;
   }
-  .list-item .desc { font-size: 13.5px; color: var(--text-muted); }
-  .list-item .desc strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 2px; }
+  .list-item .desc { font-size: 13.8px; color: var(--text-muted); }
+  .list-item .desc strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 2px; font-family: var(--font-body); }
 
-  /* ============ STEPS / TUTORIAL ============ */
+  /* ============ STEPS ============ */
   .steps { display: flex; flex-direction: column; gap: 0; }
-  .step {
-    display: flex;
-    gap: 16px;
-    padding-bottom: 26px;
-    position: relative;
-  }
+  .step { display: flex; gap: 18px; padding-bottom: 28px; position: relative; }
   .step:last-child { padding-bottom: 0; }
   .step:not(:last-child)::before {
     content: "";
     position: absolute;
     left: 15px;
-    top: 34px;
+    top: 36px;
     bottom: 0;
     width: 1px;
     background: var(--border-strong);
@@ -399,21 +351,21 @@
     border: 1px solid var(--border-strong);
     display: grid;
     place-items: center;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
+    font-weight: 500;
+    color: var(--accent);
     flex-shrink: 0;
     z-index: 1;
   }
-  .step-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-  .step-body p { font-size: 13.5px; color: var(--text-muted); }
+  .step-body h4 { font-size: 14.5px; font-weight: 600; margin-bottom: 4px; font-family: var(--font-body); }
+  .step-body p { font-size: 13.8px; color: var(--text-muted); }
 
-  /* ============ ONBOARDING OVERLAY ============ */
+  /* ============ ONBOARDING ============ */
   .onboarding {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.75);
+    background: rgba(6,7,9,0.78);
     backdrop-filter: blur(8px);
     display: grid;
     place-items: center;
@@ -427,10 +379,10 @@
   .ob-card {
     background: var(--bg-elev);
     border: 1px solid var(--border-strong);
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     width: 100%;
     max-width: 480px;
-    padding: 32px;
+    padding: 34px;
     box-shadow: 0 30px 80px rgba(0,0,0,0.8);
     animation: popIn .35s cubic-bezier(.2,.9,.3,1.2);
   }
@@ -439,55 +391,17 @@
     to { opacity: 1; transform: scale(1) translateY(0); }
   }
 
-  .ob-progress {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 22px;
-  }
-  .ob-bar {
-    height: 3px;
-    flex: 1;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .ob-bar span {
-    display: block;
-    height: 100%;
-    width: 0;
-    background: var(--accent);
-    transition: width .4s ease;
-  }
+  .ob-progress { display: flex; gap: 6px; margin-bottom: 24px; }
+  .ob-bar { height: 3px; flex: 1; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .ob-bar span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .4s ease; }
   .ob-bar.done span, .ob-bar.active span { width: 100%; }
 
-  .ob-step-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
+  .ob-step-tag { font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 10px; }
 
-  .ob-card h2 {
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: -.3px;
-    margin-bottom: 10px;
-  }
-  .ob-card p {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 26px;
-    min-height: 66px;
-  }
+  .ob-card h2 { font-size: 22px; font-weight: 600; letter-spacing: -.3px; margin-bottom: 10px; }
+  .ob-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 26px; min-height: 66px; }
 
-  .ob-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-  }
+  .ob-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .ob-actions .right { display: flex; gap: 10px; }
 
   /* ============ ABOUT ============ */
@@ -500,22 +414,15 @@
     border-radius: var(--radius);
     overflow: hidden;
   }
-  .meta-cell {
-    background: var(--surface);
-    padding: 16px 18px;
-  }
-  .meta-cell .k {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--text-dim);
-    margin-bottom: 6px;
-  }
-  .meta-cell .v {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13.5px;
-    color: var(--text);
-  }
+  .meta-cell { background: var(--surface); padding: 17px 18px; }
+  .meta-cell .k { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+  .meta-cell .v { font-family: var(--font-mono); font-size: 13.8px; color: var(--text); }
+
+  /* ============ FAQ ============ */
+  .faq-item { border-bottom: 1px solid var(--border); padding: 17px 0; }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-q { font-size: 14.5px; font-weight: 600; margin-bottom: 6px; font-family: var(--font-body); }
+  .faq-a { font-size: 13.8px; color: var(--text-muted); }
 
   /* ============ RESPONSIVE ============ */
   @media (max-width: 860px) {
@@ -524,88 +431,71 @@
     .main { margin-left: 0; }
     .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
     .topbar { padding: 0 18px; }
-    .content { padding: 24px 18px 60px; }
+    .content { padding: 26px 18px 60px; }
     .grid-2 { grid-template-columns: 1fr; }
     .meta-grid { grid-template-columns: 1fr; }
-    .page-title { font-size: 22px; }
+    .page-title { font-size: 24px; }
   }
 </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- ============ SIDEBAR ============ -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="brand-mark">T</div>
       <div class="brand-text">
-        <span class="brand-title">TAKAMURA BOT</span>
-        <span class="brand-version">Version 1</span>
+        <span class="brand-title">Takamura Bot</span>
+        <span class="brand-version">v1.0</span>
       </div>
     </div>
 
     <nav class="nav">
       <div class="nav-label">Général</div>
-      <button class="nav-item active" data-view="home">
-        <span class="nav-dot"></span> Accueil
-      </button>
-      <button class="nav-item" data-view="pair">
-        <span class="nav-dot"></span> Pairage
-      </button>
+      <button class="nav-item active" data-view="home"> Accueil</button>
+      <button class="nav-item" data-view="pair"> Pairage</button>
 
       <div class="nav-label">Documentation</div>
-      <button class="nav-item" data-view="guide">
-        <span class="nav-dot"></span> Mode d'emploi
-      </button>
-      <button class="nav-item" data-view="features">
-        <span class="nav-dot"></span> Fonctionnalités
-      </button>
-      <button class="nav-item" data-view="commands">
-        <span class="nav-dot"></span> Commandes
-      </button>
+      <button class="nav-item" data-view="guide"> Mode d'emploi</button>
+      <button class="nav-item" data-view="features"> Fonctionnalités</button>
+      <button class="nav-item" data-view="commands"> Commandes</button>
 
       <div class="nav-label">Informations</div>
-      <button class="nav-item" data-view="faq">
-        <span class="nav-dot"></span> FAQ
-      </button>
-      <button class="nav-item" data-view="about">
-        <span class="nav-dot"></span> À propos
-      </button>
+      <button class="nav-item" data-view="faq"> FAQ</button>
+      <button class="nav-item" data-view="about"> À propos</button>
     </nav>
 
     <div class="sidebar-footer">
       <span><span class="status-dot"></span>Système actif</span>
-      <span>V1.0</span>
+      <span>v1.0</span>
     </div>
   </aside>
 
-  <!-- ============ MAIN ============ -->
   <div class="main">
     <header class="topbar">
       <div style="display:flex;align-items:center;">
         <button class="menu-toggle" id="menuToggle" aria-label="Menu">≡</button>
         <h2 id="viewTitle">Accueil</h2>
       </div>
-      <div class="topbar-meta">TAKAMURA / CONSOLE</div>
+      <div class="topbar-meta">takamura / console</div>
     </header>
 
     <div class="content">
 
       <!-- ===== HOME ===== -->
       <section class="view active" id="view-home">
-        <h1 class="page-title">Bienvenue sur TAKAMURA BOT</h1>
+        <h1 class="page-title">Bienvenue sur Takamura Bot</h1>
         <p class="page-sub">
           Console de gestion pour votre bot WhatsApp. Connectez un compte,
           consultez la documentation et pilotez vos fonctionnalités depuis une interface unique.
         </p>
 
-        <div class="section-title">Démarrage rapide</div>
-        <div class="card">
+        <div class="section-title">démarrage rapide</div>
+        <div class="card hero">
           <div class="card-header">
             <h3>Connecter votre compte</h3>
-            <span class="nav-dot" style="background:var(--accent)"></span>
           </div>
-          <p style="margin-bottom:16px;">
+          <p style="margin-bottom:18px;">
             Rendez-vous dans la section « Pairage », entrez votre numéro au format international
             et récupérez un code à saisir sur WhatsApp pour activer le bot.
           </p>
@@ -629,11 +519,9 @@
       <!-- ===== PAIR ===== -->
       <section class="view" id="view-pair">
         <h1 class="page-title">Pairage du bot</h1>
-        <p class="page-sub">
-          Entrez le numéro WhatsApp du bot au format international, sans espaces ni symbole « + ».
-        </p>
+        <p class="page-sub">Entrez le numéro WhatsApp du bot au format international, sans espaces ni symbole « + ».</p>
 
-        <div class="card">
+        <div class="card hero">
           <div class="field">
             <label for="phonePair">Numéro de téléphone</label>
             <input id="phonePair" type="tel" placeholder="2376XXXXXXXX" autocomplete="off">
@@ -643,7 +531,7 @@
           <button id="copyBtn" class="btn btn-success" style="display:none; margin-top:12px;">Copier le code</button>
         </div>
 
-        <div class="section-title">Comment ça marche</div>
+        <div class="section-title">comment ça marche</div>
         <div class="steps">
           <div class="step">
             <div class="step-num">01</div>
@@ -663,10 +551,7 @@
             <div class="step-num">03</div>
             <div class="step-body">
               <h4>Associer sur WhatsApp</h4>
-              <p>
-                Ouvrez WhatsApp, allez dans « Appareils connectés », choisissez
-                « Associer avec un numéro de téléphone » et saisissez le code.
-              </p>
+              <p>Ouvrez WhatsApp, allez dans « Appareils connectés », choisissez « Associer avec un numéro de téléphone » et saisissez le code.</p>
             </div>
           </div>
           <div class="step">
@@ -682,17 +567,14 @@
       <!-- ===== GUIDE ===== -->
       <section class="view" id="view-guide">
         <h1 class="page-title">Mode d'emploi</h1>
-        <p class="page-sub">Suivez ces étapes pour configurer et utiliser TAKAMURA BOT correctement.</p>
+        <p class="page-sub">Suivez ces étapes pour configurer et utiliser Takamura Bot correctement.</p>
 
-        <div class="section-title">Étape 1 — Pairage</div>
+        <div class="section-title">étape 1 — pairage</div>
         <div class="card">
-          <p>
-            Connectez votre compte via la section Pairage. Le code généré doit être utilisé
-            immédiatement, il expire au bout de quelques minutes.
-          </p>
+          <p>Connectez votre compte via la section Pairage. Le code généré doit être utilisé immédiatement, il expire au bout de quelques minutes.</p>
         </div>
 
-        <div class="section-title">Étape 2 — Activation des fonctionnalités</div>
+        <div class="section-title">étape 2 — activation des fonctionnalités</div>
         <div class="card">
           <p>
             Depuis WhatsApp, envoyez une commande de type
@@ -702,7 +584,262 @@
           </p>
         </div>
 
-        <div class="section-title">Étape 3 — Commandes du bot</div>
+        <div class="section-title">étape 3 — commandes du bot</div>
         <div class="card">
           <p>
-            Toutes les commandes commencent par le préfixe défini (par défaut : <strong>.</str
+            Toutes les commandes commencent par le préfixe défini (par défaut : <code>.</code>).
+            Consultez la section « Commandes » pour la liste complète des commandes disponibles
+            et « Fonctionnalités » pour les options activables ou désactivables à la volée.
+          </p>
+        </div>
+      </section>
+
+      <!-- ===== FEATURES ===== -->
+      <section class="view" id="view-features">
+        <h1 class="page-title">Fonctionnalités</h1>
+        <p class="page-sub">Ces options s'activent et se désactivent avec <code>.nom on</code> / <code>.nom off</code> depuis WhatsApp.</p>
+
+        <div class="list">
+          <div class="list-item">
+            <span class="cmd">autoread</span>
+            <div class="desc"><strong>Lecture automatique</strong>Marque les messages reçus comme lus dès leur arrivée.</div>
+          </div>
+          <div class="list-item">
+            <span class="cmd">autoreact</span>
+            <div class="desc"><strong>Réaction automatique</strong>Réagit avec un emoji aléatoire à chaque message reçu.</div>
+          </div>
+          <div class="list-item">
+            <span class="cmd">autotyping</span>
+            <div class="desc"><strong>Simuler la frappe</strong>Affiche « en train d'écrire… » dans les groupes.</div>
+          </div>
+          <div class="list-item">
+            <span class="cmd">autorecording</span>
+            <div class="desc"><strong>Simuler l'enregistrement</strong>Affiche « en train d'enregistrer un vocal… » dans les groupes.</div>
+          </div>
+          <div class="list-item">
+            <span class="cmd">welcome</span>
+            <div class="desc"><strong>Message de bienvenue</strong>Salue automatiquement chaque nouveau membre d'un groupe.</div>
+          </div>
+          <div class="list-item">
+            <span class="cmd">bye</span>
+            <div class="desc"><strong>Message de départ</strong>Signale quand un membre quitte le groupe.</div>
+          </div>
+          <div class="list-item">
+            <span class="cmd">antilink</span>
+            <div class="desc"><strong>Anti-lien</strong>Bloque le partage de liens dans les groupes protégés.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== COMMANDS ===== -->
+      <section class="view" id="view-commands">
+        <h1 class="page-title">Commandes</h1>
+        <p class="page-sub">Commandes disponibles avec le préfixe par défaut « . ». La liste se met à jour selon les commandes présentes dans le dossier <code>/commands</code>.</p>
+
+        <div class="list">
+          <div class="list-item">
+            <span class="cmd">.autoread</span>
+            <div class="desc"><strong>on / off</strong>Active ou désactive la lecture automatique des messages.</div>
+          </div>
+          <div class="list-item">
+            <span class="cmd">.autoreact</span>
+            <div class="desc"><strong>on / off</strong>Active ou désactive les réactions automatiques.</div>
+          </div>
+          <div class="list-item">
+            <span class="cmd">.welcome</span>
+            <div class="desc"><strong>on / off</strong>Active ou désactive les messages de bienvenue en groupe.</div>
+          </div>
+        </div>
+        <p style="color:var(--text-muted); font-size:13.5px; margin-top:16px;">
+          Ajoutez vos propres commandes personnalisées dans le dossier <code>/commands</code> du serveur ;
+          elles apparaîtront automatiquement ici après redémarrage.
+        </p>
+      </section>
+
+      <!-- ===== FAQ ===== -->
+      <section class="view" id="view-faq">
+        <h1 class="page-title">FAQ</h1>
+        <p class="page-sub">Questions fréquentes sur Takamura Bot.</p>
+
+        <div class="card">
+          <div class="faq-item">
+            <div class="faq-q">Le code de pairage a expiré, que faire ?</div>
+            <div class="faq-a">Retournez dans la section Pairage et générez un nouveau code, puis saisissez-le immédiatement dans WhatsApp.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">Le bot se déconnecte régulièrement</div>
+            <div class="faq-a">Vérifiez votre connexion et évitez de vous connecter au même numéro depuis plusieurs appareils WhatsApp Web en même temps.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">Comment changer le préfixe des commandes ?</div>
+            <div class="faq-a">Le préfixe se configure côté serveur dans la configuration du bot (valeur par défaut : « . »).</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ABOUT ===== -->
+      <section class="view" id="view-about">
+        <h1 class="page-title">À propos</h1>
+        <p class="page-sub">Informations techniques sur cette instance.</p>
+
+        <div class="meta-grid">
+          <div class="meta-cell"><div class="k">nom</div><div class="v">Takamura Bot</div></div>
+          <div class="meta-cell"><div class="k">version</div><div class="v">v1.0</div></div>
+          <div class="meta-cell"><div class="k">moteur</div><div class="v">Baileys / Node.js</div></div>
+          <div class="meta-cell"><div class="k">préfixe par défaut</div><div class="v">.</div></div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== ONBOARDING (facultatif, masqué par défaut) ===== -->
+<div class="onboarding hidden" id="onboarding">
+  <div class="ob-card">
+    <div class="ob-progress">
+      <div class="ob-bar active" id="obBar1"><span></span></div>
+      <div class="ob-bar" id="obBar2"><span></span></div>
+    </div>
+    <div class="ob-step-tag" id="obTag">Étape 1 / 2</div>
+    <h2 id="obTitle">Bienvenue</h2>
+    <p id="obText">Configurons votre bot en quelques secondes.</p>
+    <div class="ob-actions">
+      <button class="btn btn-ghost" id="obSkip">Passer</button>
+      <div class="right">
+        <button class="btn btn-primary" id="obNext">Suivant</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const titles = {
+    home: "Accueil",
+    pair: "Pairage",
+    guide: "Mode d'emploi",
+    features: "Fonctionnalités",
+    commands: "Commandes",
+    faq: "FAQ",
+    about: "À propos"
+  };
+
+  function goTo(view) {
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+
+    const target = document.getElementById(`view-${view}`);
+    const navBtn = document.querySelector(`.nav-item[data-view="${view}"]`);
+    if (target) target.classList.add("active");
+    if (navBtn) navBtn.classList.add("active");
+
+    document.getElementById("viewTitle").textContent = titles[view] || view;
+    document.getElementById("sidebar").classList.remove("open");
+  }
+
+  document.querySelectorAll(".nav-item").forEach(btn => {
+    btn.addEventListener("click", () => goTo(btn.dataset.view));
+  });
+
+  document.getElementById("menuToggle").addEventListener("click", () => {
+    document.getElementById("sidebar").classList.toggle("open");
+  });
+
+  const pairBtn = document.getElementById("pairBtn");
+  const phoneInput = document.getElementById("phonePair");
+  const pairResult = document.getElementById("pairResult");
+  const copyBtn = document.getElementById("copyBtn");
+  let lastCode = "";
+
+  function showResult(type, html) {
+    pairResult.className = `result show ${type}`;
+    pairResult.innerHTML = html;
+  }
+
+  pairBtn.addEventListener("click", async () => {
+    const number = phoneInput.value.trim();
+    if (!number) {
+      showResult("err", "Veuillez saisir un numéro.");
+      return;
+    }
+
+    pairBtn.disabled = true;
+    pairBtn.textContent = "Génération en cours...";
+    copyBtn.style.display = "none";
+    showResult("info", "Connexion en cours, veuillez patienter...");
+
+    try {
+      const res = await fetch(`/pair-api/code?number=${encodeURIComponent(number)}`);
+      const data = await res.json();
+
+      if (data.error) {
+        showResult("err", data.error);
+      } else if (data.code) {
+        lastCode = data.code;
+        showResult("ok", `Code de pairage : <code>${data.code}</code><br>Saisissez-le dans WhatsApp sous « Associer avec un numéro de téléphone ».`);
+        copyBtn.style.display = "inline-flex";
+      } else if (data.status === "connected") {
+        showResult("ok", "Ce numéro est déjà connecté.");
+      }
+    } catch (err) {
+      showResult("err", "Erreur réseau, impossible de contacter le serveur.");
+    } finally {
+      pairBtn.disabled = false;
+      pairBtn.textContent = "Générer le code de pairage";
+    }
+  });
+
+  copyBtn.addEventListener("click", async () => {
+    if (!lastCode) return;
+    try {
+      await navigator.clipboard.writeText(lastCode);
+      copyBtn.textContent = "Copié !";
+      setTimeout(() => (copyBtn.textContent = "Copier le code"), 1500);
+    } catch (err) {
+      showResult("err", "Impossible de copier automatiquement, copiez le code manuellement.");
+    }
+  });
+
+  const steps = [
+    { tag: "Étape 1 / 2", title: "Bienvenue sur Takamura Bot", text: "Cette console vous permet de connecter et piloter votre bot WhatsApp." },
+    { tag: "Étape 2 / 2", title: "Connectez votre compte", text: "Rendez-vous dans « Pairage » pour générer votre code et associer WhatsApp." }
+  ];
+  let obIndex = 0;
+  const ob = document.getElementById("onboarding");
+  const obTag = document.getElementById("obTag");
+  const obTitle = document.getElementById("obTitle");
+  const obText = document.getElementById("obText");
+  const obNext = document.getElementById("obNext");
+  const obSkip = document.getElementById("obSkip");
+  const obBar1 = document.getElementById("obBar1");
+  const obBar2 = document.getElementById("obBar2");
+
+  function renderOnboarding() {
+    const s = steps[obIndex];
+    obTag.textContent = s.tag;
+    obTitle.textContent = s.title;
+    obText.textContent = s.text;
+    obBar1.classList.toggle("active", obIndex === 0);
+    obBar1.classList.toggle("done", obIndex > 0);
+    obBar2.classList.toggle("active", obIndex === 1);
+    obNext.textContent = obIndex === steps.length - 1 ? "Terminer" : "Suivant";
+  }
+
+  function closeOnboarding() { ob.classList.add("hidden"); }
+
+  obNext.addEventListener("click", () => {
+    if (obIndex < steps.length - 1) {
+      obIndex++;
+      renderOnboarding();
+    } else {
+      closeOnboarding();
+      goTo("pair");
+    }
+  });
+  obSkip.addEventListener("click", closeOnboarding);
+
+  renderOnboarding();
+</script>
+
+</body>
+</html>
