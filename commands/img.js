@@ -1,19 +1,15 @@
-// commands/img.js
 import fetch from "node-fetch";
-import { style } from "../lib/style.js";
 
 export default {
   name: "img",
   description: "Recherche et envoie des images depuis un mot-clé",
   category: "Images",
 
-  async execute(sock, message, args) {
-    const { from, reply, bots } = message;
-    const botNumber = sock.user.id.split(":")[0];
-    const prefix = bots?.get(botNumber)?.config?.prefix || ".";
+  async execute(sock, message, args, prefix = ".") {
+    const { from, reply } = message;
 
     if (!args[0]) {
-      return reply(style.warn(`Utilisation : ${prefix}img <mot-clé> [nombre]\nExemples :\n• ${prefix}img naruto\n• ${prefix}img voiture 5`));
+      return await reply(`⚠️ Utilisation : ${prefix}img <mot-clé> [nombre]\nExemples :\n• ${prefix}img naruto\n• ${prefix}img voiture 5`);
     }
 
     const lastArg = args[args.length - 1];
@@ -21,8 +17,9 @@ export default {
     const query = !isNaN(lastArg) ? args.slice(0, -1).join(" ") : args.join(" ");
 
     try {
-      await sock.sendMessage(from, { text: style.info(`Recherche de *${count}* image(s) pour : *${query}*...`) });
+      await sock.sendMessage(from, { text: `🖼️ Recherche de *${count}* image(s) pour : *${query}*...\n⏳ Veuillez patienter...` });
 
+      // ───── Requête Bing Images ─────
       const bingUrl = `https://www.bing.com/images/search?q=${encodeURIComponent(query)}&form=HDRSC2`;
       const res = await fetch(bingUrl);
       const html = await res.text();
@@ -31,29 +28,35 @@ export default {
         .map(m => m[1])
         .filter(u => u.startsWith("http"));
 
-      if (!imageUrls.length) return reply(style.warn(`Aucune image trouvée pour : *${query}*`));
+      if (!imageUrls.length) {
+        return await reply(`⚠️ Aucune image trouvée pour : *${query}*`);
+      }
 
+      // ───── Envoi des images ─────
       const imagesToSend = imageUrls.slice(0, count);
-      let sent = 0;
-
       for (let i = 0; i < imagesToSend.length; i++) {
         try {
           const response = await fetch(imagesToSend[i]);
           const buffer = Buffer.from(await response.arrayBuffer());
+
           if (buffer.length < 5000) continue;
 
-          await sock.sendMessage(from, { image: buffer, caption: `${query} (${i + 1}/${imagesToSend.length})` });
-          sent++;
+          await sock.sendMessage(from, {
+            image: buffer,
+            caption: `🖼️ ${query} (${i + 1}/${imagesToSend.length})`
+          });
+
           await new Promise(r => setTimeout(r, 1000));
         } catch (e) {
           console.error("Erreur envoi image :", e.message);
         }
       }
 
-      await sock.sendMessage(from, { text: style.ok(`${sent}/${count} image(s) envoyée(s) pour *${query}*.`) });
+      await sock.sendMessage(from, { text: `✅ ${imagesToSend.length}/${count} image(s) envoyée(s) pour *${query}*.` });
+
     } catch (err) {
-      console.error("❌ img:", err);
-      await reply(style.err("Une erreur est survenue lors de la recherche d'images."));
+      console.error("❌ Img error:", err);
+      await reply("❌ Une erreur est survenue lors de la recherche d'images.");
     }
   }
 };

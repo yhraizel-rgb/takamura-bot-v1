@@ -1,42 +1,61 @@
-// commands/promoteall.js
-import "dotenv/config";
-import { style } from "../lib/style.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 export default {
   name: "promoteall",
-  description: "Promeut tous les membres du groupe",
+  description: "𝙿𝚛𝚘𝚖𝚘𝚝𝚎 𝚝𝚘𝚞𝚜 𝚕𝚎𝚜 𝚖𝚎𝚖𝚋𝚛𝚎𝚜 𝚍𝚞 𝚐𝚛𝚘𝚞𝚙𝚎",
 
-  async execute(sock, message) {
-    const { from, reply, isGroup, raw } = message;
+  async execute(sock, message, args) {
+    const { from, reply } = message;
 
-    if (!isGroup) return reply(style.err("Cette commande est réservée aux groupes."));
+    if (!from.endsWith("@g.us")) {
+      return await reply("❌ 𝙲𝚘𝚖𝚖𝚊𝚗𝚍𝚎 𝚛é𝚜𝚎𝚛𝚟é𝚎 𝚊𝚞𝚡 𝚐𝚛𝚘𝚞𝚙𝚎𝚜.");
+    }
 
     try {
       const metadata = await sock.groupMetadata(from);
       const participants = metadata.participants || [];
 
-      const botJid = (sock?.user?.id?.split(":")[0] || "") + "@s.whatsapp.net";
+      const botJid =
+        (sock?.user?.id?.split(":")[0] || sock?.user?.jid?.split(":")[0] || "") +
+        "@s.whatsapp.net";
+
       const ownerNumber = process.env.NUMBER?.replace(/\D/g, "");
       const ownerJid = ownerNumber ? `${ownerNumber}@s.whatsapp.net` : null;
 
-      const isAdmin = p => p?.admin === "admin" || p?.admin === "superadmin";
+      if (!ownerJid) {
+        return await reply("⚠️ 𝙽𝚞𝚖é𝚛𝚘 𝚍𝚞 𝚙𝚛𝚘𝚙𝚛𝚒é𝚝𝚊𝚒𝚛𝚎 𝚗𝚘𝚗 𝚌𝚘𝚗𝚏𝚒𝚐𝚞𝚛é.");
+      }
+
+      const isAdmin = p =>
+        p?.admin === "admin" || p?.admin === "superadmin";
 
       const targets = participants
-        .filter(p => p.id && !isAdmin(p) && p.id !== botJid && p.id !== ownerJid)
+        .filter(p => {
+          const jid = p.id;
+          return jid && !isAdmin(p) && jid !== botJid && jid !== ownerJid;
+        })
         .map(p => p.id);
 
-      if (targets.length === 0) return reply(style.ok("Tous les membres sont déjà admins."));
+      if (targets.length === 0) {
+        return await reply("✅ 𝚃𝚘𝚞𝚜 𝚕𝚎𝚜 𝚖𝚎𝚖𝚋𝚛𝚎𝚜 𝚜𝚘𝚗𝚝 𝚍é𝚓à 𝚊𝚍𝚖𝚒𝚗𝚜.");
+      }
 
       await sock.groupParticipantsUpdate(from, targets, "promote");
 
+      const text =
+        `✅ 𝙿𝚛𝚘𝚖𝚘𝚝𝚒𝚘𝚗 𝚛é𝚞𝚜𝚜𝚒𝚎\n` +
+        `𝙼𝚎𝚖𝚋𝚛𝚎𝚜 𝚙𝚛𝚘𝚖𝚞𝚜 : ${targets.length}`;
+
       await sock.sendMessage(
         from,
-        { text: style.ok(`${targets.length} membre(s) promu(s) admin.`), mentions: targets },
-        { quoted: raw }
+        { text, mentions: targets },
+        { quoted: message.raw }
       );
+
     } catch (err) {
-      console.error("❌ promoteall:", err);
-      await reply(style.err("Erreur lors de l'exécution."));
+      console.error("promoteall error:", err);
+      await reply("❌ 𝙴𝚛𝚛𝚎𝚞𝚛 𝚕𝚘𝚛𝚜 𝚍𝚎 𝚕’𝚎𝚡é𝚌𝚞𝚝𝚒𝚘𝚗.");
     }
   }
 };

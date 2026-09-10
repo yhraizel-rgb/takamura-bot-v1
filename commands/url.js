@@ -1,15 +1,16 @@
-// commands/url.js
 import { downloadContentFromMessage } from "@whiskeysockets/baileys";
 import fs from "fs";
 import { join } from "path";
 import FormData from "form-data";
-import fetch from "node-fetch";
-import { style } from "../lib/style.js";
+import axios from "axios";
 
 async function streamToBuffer(stream) {
-  const chunks = [];
-  for await (const chunk of stream) chunks.push(chunk);
-  return Buffer.concat(chunks);
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on("data", (c) => chunks.push(c));
+    stream.on("end", () => resolve(Buffer.concat(chunks)));
+    stream.on("error", reject);
+  });
 }
 
 export default {
@@ -17,34 +18,31 @@ export default {
   description: "Génère une URL à partir d'une image, vidéo ou audio",
 
   async execute(sock, message) {
-    const { raw, reply } = message;
+    const { from, raw, reply } = message;
 
     try {
       const quoted = raw.message?.extendedTextMessage?.contextInfo?.quotedMessage || raw.message;
       const type = quoted.imageMessage ? "image" : quoted.videoMessage ? "video" : quoted.audioMessage ? "audio" : null;
-      if (!type) return reply(style.warn("Réponds à un média (image, vidéo ou audio)."));
+      if (!type) return await reply("𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ⚠️ Réponds à un média.");
 
       const stream = await downloadContentFromMessage(quoted[`${type}Message`], type);
       const buffer = await streamToBuffer(stream);
 
-      const tempDir = "./temp";
-      fs.mkdirSync(tempDir, { recursive: true });
+      const tempDir = "./temp"; fs.mkdirSync(tempDir, { recursive: true });
       const ext = type === "image" ? "jpg" : type === "video" ? "mp4" : "mp3";
-      const filePath = join(tempDir, `media_${Date.now()}.${ext}`);
-      fs.writeFileSync(filePath, buffer);
+      const path = join(tempDir, `media_${Date.now()}.${ext}`);
+      fs.writeFileSync(path, buffer);
 
       const form = new FormData();
       form.append("reqtype", "fileupload");
-      form.append("fileToUpload", fs.createReadStream(filePath));
+      form.append("fileToUpload", fs.createReadStream(path));
 
-      const res = await fetch("https://catbox.moe/user/api.php", { method: "POST", body: form, headers: form.getHeaders() });
-      const url = await res.text();
-      fs.unlinkSync(filePath);
+      const url = (await axios.post("https://catbox.moe/user/api.php", form, { headers: form.getHeaders() })).data;
+      fs.unlinkSync(path);
 
-      await reply(style.ok(url, "Lien généré"));
+      await reply(`𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 🔗 ${url}`);
     } catch (err) {
-      console.error("❌ url:", err);
-      await reply(style.err(err.message));
+      await reply(`𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ❌ ${err.message}`);
     }
   }
 };

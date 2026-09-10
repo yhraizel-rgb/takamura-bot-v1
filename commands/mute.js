@@ -1,20 +1,17 @@
-// commands/mute.js
-import { style } from "../lib/style.js";
-
 export default {
   name: "mute",
-  description: "Restreint l'envoi de messages aux admins",
-
-  async execute(sock, message) {
+  description: "🔇 Mute the group (only admins can send messages)",
+  
+  async execute(sock, message, args) {
     const { from, reply, isGroup } = message;
-    if (!isGroup) return reply(style.err("Cette commande est réservée aux groupes."));
+    if (!isGroup) return await reply("❌ This command works only in groups");
 
     try {
-      await sock.groupSettingUpdate(from, "announcement");
-      await reply(style.ok("Seuls les admins peuvent maintenant envoyer des messages.", "Groupe muté"));
-    } catch (err) {
-      console.error("❌ mute:", err);
-      await reply(style.err("Impossible de muter le groupe. Vérifie mes permissions."));
+      await sock.groupSettingUpdate(from, "announcement"); // only admins can send
+      await reply("🔇 𝙶𝚛𝚘𝚞𝚙 muted: only admins can send messages");
+    } catch (e) {
+      console.error("Mute error:", e);
+      await reply("❌ Cannot mute the group");
     }
   }
 };

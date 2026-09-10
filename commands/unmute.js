@@ -1,20 +1,17 @@
-// commands/unmute.js
-import { style } from "../lib/style.js";
-
 export default {
   name: "unmute",
-  description: "Autorise à nouveau tout le monde à écrire",
-
-  async execute(sock, message) {
+  description: "🔊 Unmute the group (everyone can send messages)",
+  
+  async execute(sock, message, args) {
     const { from, reply, isGroup } = message;
-    if (!isGroup) return reply(style.err("Cette commande est réservée aux groupes."));
+    if (!isGroup) return await reply("❌ This command works only in groups");
 
     try {
-      await sock.groupSettingUpdate(from, "not_announcement");
-      await reply(style.ok("Tout le monde peut maintenant envoyer des messages.", "Groupe démuté"));
-    } catch (err) {
-      console.error("❌ unmute:", err);
-      await reply(style.err("Impossible de démuter le groupe. Vérifie mes permissions."));
+      await sock.groupSettingUpdate(from, "not_announcement"); // everyone can send
+      await reply("🔊 𝙶𝚛𝚘𝚞𝚙 unmuted: everyone can send messages");
+    } catch (e) {
+      console.error("Unmute error:", e);
+      await reply("❌ Cannot unmute the group");
     }
   }
 };

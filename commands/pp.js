@@ -1,20 +1,23 @@
 // commands/pp.js
-import { style } from "../lib/style.js";
-
 export default {
   name: "pp",
-  description: "Récupère la photo de profil d'un ou plusieurs membres",
+  description: "Récupère la photo de profil de plusieurs membres (reply/mention)",
 
-  async execute(sock, message) {
+  async execute(sock, message, args) {
     const { from, reply, raw, sender } = message;
 
     try {
+      // 1️⃣ Déterminer les cibles
       let targets = raw.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+
       const quotedUser = raw.message?.extendedTextMessage?.contextInfo?.participant;
       if (quotedUser && !targets.includes(quotedUser)) targets.push(quotedUser);
-      if (targets.length === 0) targets = [sender];
 
-      let sent = 0;
+      if (targets.length === 0) targets.push(sender); // par défaut l'auteur
+
+      // 2️⃣ Récupérer toutes les photos
+      const photos = [];
+      const captions = [];
 
       for (const target of targets) {
         let ppUrl;
@@ -25,18 +28,34 @@ export default {
         }
 
         if (!ppUrl) {
-          await sock.sendMessage(from, { text: style.err(`Aucune photo disponible pour @${target.split("@")[0]}`), mentions: [target] });
+          captions.push(`❌ Impossible de récupérer la photo de ${target.split("@")[0]}`);
           continue;
         }
 
-        await sock.sendMessage(from, { image: { url: ppUrl }, caption: `📸 @${target.split("@")[0]}`, mentions: [target] });
-        sent++;
+        photos.push({ url: ppUrl });
+        captions.push(`📸 ${target.split("@")[0]}`);
       }
 
-      if (sent === 0) await reply(style.err("Aucune photo de profil n'a pu être récupérée."));
+      if (photos.length === 0) {
+        await reply("❌ Aucune photo de profil disponible.");
+        return;
+      }
+
+      // 3️⃣ Envoyer toutes les photos en un seul message si possible
+      // WhatsApp ne permet pas d'envoyer plusieurs images avec des légendes différentes en un seul message,
+      // mais on peut envoyer un album de medias
+      const mediaMessages = photos.map((p, i) => ({
+        image: { url: p.url },
+        caption: captions[i]
+      }));
+
+      for (const media of mediaMessages) {
+        await sock.sendMessage(from, media);
+      }
+
     } catch (err) {
-      console.error("❌ pp:", err);
-      await reply(style.err("Une erreur est survenue lors de la récupération des photos."));
+      console.error("❌ PP error:", err);
+      await reply("❌ Une erreur est survenue lors de la récupération des photos.");
     }
   }
 };

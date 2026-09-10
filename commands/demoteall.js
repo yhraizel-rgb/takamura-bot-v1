@@ -1,50 +1,47 @@
-// commands/demoteall.js
-import { style } from "../lib/style.js";
-
 export default {
   name: "demoteall",
-  description: "Rétrograde tous les admins, sauf le bot et la liste sudo",
-
-  async execute(sock, message) {
-    const { from, reply, raw, sender, isGroup, bots } = message;
-
-    if (!isGroup) return reply(style.err("Cette commande est réservée aux groupes."));
+  description: "𝙳𝚎𝚖𝚘𝚝𝚎 𝚊𝚕𝚕 𝚊𝚍𝚖𝚒𝚗𝚜 𝚎𝚡𝚌𝚎𝚙𝚝 𝚋𝚘𝚝, 𝚘𝚠𝚗𝚎𝚛𝚜, 𝚜𝚞𝚍𝚘 & 𝚋𝚘𝚝 𝙻𝙸𝙳",
+  
+  async execute(sock, message, args) {
+    const { from, reply, raw, sender } = message;
 
     try {
+      // --- Récupère les metadata du groupe ---
       const groupMeta = await sock.groupMetadata(from);
       const participants = groupMeta.participants;
 
       const botJid = sock.user.id.split(":")[0] + "@s.whatsapp.net";
-      const botLid = sock.user.lid ? sock.user.lid.split(":")[0] + "@lid" : "";
+      const botLid = sock.user.lid?.split(":")[0] + "@lid" || "";
 
-      // Liste sudo récupérée depuis la config du bot courant (passée via ctx.bots),
-      // pas depuis une variable globale qui n'existe pas dans index.js.
-      const botNumber = sock.user.id.split(":")[0];
-      const sudoList = (bots?.get(botNumber)?.config?.sudoList || []).map(n => n.split("@")[0]);
+      // --- Owners et sudo depuis config global ---
+      const owners = global.owners || [];
+      const sudoList = (global.bots?.get(botJid)?.config?.sudoList || []).map(n => n.split("@")[0]);
 
+      // --- Détermine qui démotrer ---
       const toDemote = participants
-        .filter(p =>
-          p.admin &&
-          p.id !== botJid &&
-          p.id.split("@")[0] !== botLid.split("@")[0] &&
+        .filter(p => 
+          p.admin &&               // est admin
+          p.id !== botJid &&       // pas le bot
+          p.id.split("@")[0] !== botLid && // pas le LID du bot
+          !owners.includes(p.id.split("@")[0]) &&
           !sudoList.includes(p.id.split("@")[0])
         )
         .map(p => p.id);
 
-      if (toDemote.length === 0) return reply(style.warn("Aucun admin à rétrograder."));
+      if (toDemote.length === 0) {
+        return await reply("⚠️ 𝙽𝚘 admins to demote.");
+      }
 
+      // --- Démote les cibles ---
       await sock.groupParticipantsUpdate(from, toDemote, "demote");
       await sock.sendMessage(from, { react: { text: "⬇️", key: raw.key } });
 
-      await sock.sendMessage(from, {
-        text: style.ok(
-          `${toDemote.map(t => `@${t.split("@")[0]}`).join(", ")} rétrogradé(s).\nDemandé par @${sender.split("@")[0]}`
-        ),
-        mentions: [...toDemote, sender]
-      });
+      const teks = `⬇️ 𝙳𝚎𝚖𝚘𝚝𝚎𝚍 ${toDemote.map(t => `@${t.split("@")[0]}`).join(", ")} 𝚏𝚛𝚘𝚖 admin.\nRequested by: ${sender}`;
+      await sock.sendMessage(from, { text: teks, mentions: toDemote });
+
     } catch (err) {
-      console.error("❌ demoteall:", err);
-      await reply(style.err("Impossible de rétrograder les admins. Vérifie mes permissions."));
+      console.error("❌ demoteall error:", err);
+      await reply("❌ Can't demote admins. Check my permissions.");
     }
   }
 };

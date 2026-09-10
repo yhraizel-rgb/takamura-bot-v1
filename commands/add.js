@@ -1,29 +1,28 @@
 // commands/add.js
-import { style } from "../lib/style.js";
-
 export default {
   name: "add",
-  description: "Ajoute un membre au groupe",
+  description: "Add user to group",
 
   async execute(sock, message, args) {
     const { from, reply, isGroup } = message;
 
-    if (!isGroup) return reply(style.err("Cette commande est réservée aux groupes."));
-
-    const number = args[0]?.replace(/\D/g, "");
-    if (!number) return reply(style.warn("Indique le numéro à ajouter.\nExemple : .add 2376XXXXXXXX"));
-
-    const target = `${number}@s.whatsapp.net`;
+    if (!isGroup) return await reply("❌ Group only");
 
     try {
+      const number = args[0]?.replace(/\D/g, "");
+      if (!number) return await reply("⚠️ Number required");
+
+      const target = `${number}@s.whatsapp.net`;
       await sock.groupParticipantsUpdate(from, [target], "add");
+
       await sock.sendMessage(from, {
-        text: style.ok(`@${target.split("@")[0]} a été ajouté au groupe.`),
+        text: `✅ 𝙰𝚍𝚍𝚎𝚍 @${target.split("@")[0]} 𝚝𝚘 𝚐𝚛𝚘𝚞𝚙.`,
         mentions: [target]
       });
+
     } catch (err) {
-      console.error("❌ add:", err);
-      await reply(style.err("Impossible d'ajouter ce membre. Vérifie mes permissions d'admin."));
+      console.error("❌ Add error:", err);
+      await reply("❌ Impossible to add this member. Check my permissions.");
     }
   }
 };

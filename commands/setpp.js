@@ -1,28 +1,35 @@
-// commands/setpp.js
 import { downloadContentFromMessage } from "@whiskeysockets/baileys";
-import { style } from "../lib/style.js";
 
 export default {
   name: "setpp",
-  description: "Change la photo de profil du bot via une image citée",
+  description: "Changer la photo de profil du bot via une image citée",
 
-  async execute(sock, message) {
-    const { reply, quoted } = message;
+  async execute(sock, message, args) {
+    const { from, reply, raw } = message;
 
-    if (!quoted?.imageMessage) {
-      return reply(style.warn("Réponds à une image avec .setpp pour changer la photo de profil du bot."));
+    const ctxInfo = raw.message?.extendedTextMessage?.contextInfo;
+
+    if (!ctxInfo || !ctxInfo.quotedMessage?.imageMessage) {
+      return await reply(
+        "𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ⚠️ Réponds à une image pour changer la photo de profil du bot."
+      );
     }
 
     try {
-      const stream = await downloadContentFromMessage(quoted.imageMessage, "image");
+      const quoted = ctxInfo.quotedMessage.imageMessage;
+
+      // Télécharger l'image
+      const stream = await downloadContentFromMessage(quoted, "image");
       let buffer = Buffer.from([]);
       for await (const chunk of stream) buffer = Buffer.concat([buffer, chunk]);
 
+      // Mettre à jour la photo de profil
       await sock.updateProfilePicture(sock.user.id, buffer);
-      await reply(style.ok("La photo de profil du bot a été mise à jour !"));
+
+      await reply("𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ✅ La photo de profil du bot a été mise à jour !");
     } catch (err) {
-      console.error("❌ setpp:", err);
-      await reply(style.err("Impossible de changer la photo de profil."));
+      console.error("❌ Erreur setpp :", err);
+      await reply("𝙵𝚊𝚒𝚕𝚎𝚍 𝚝𝚘 𝚜𝚎𝚊𝚛𝚌𝚑 𝚏𝚘𝚛 𝚒𝚖𝚊𝚐𝚎𝚜 ❌ Impossible de changer la photo de profil.");
     }
   }
 };
