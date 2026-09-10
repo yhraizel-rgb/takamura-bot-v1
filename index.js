@@ -15,8 +15,6 @@ import {
   delay
 } from "@whiskeysockets/baileys";
 
-import { reactProcessing } from "./lib/style.js";
-
 const app = express();
 const PORT = process.env.PORT || 80;
 
@@ -163,10 +161,6 @@ async function startBot(inputNumber) {
 
       if (cmdName && bot.commands.has(cmdName)) {
         try {
-          await reactProcessing(sock, msg);
-
-          const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
-
           await bot.commands.get(cmdName).execute(
             sock,
             {
@@ -174,7 +168,6 @@ async function startBot(inputNumber) {
               from: remoteJid,
               sender: participant,
               isGroup: remoteJid.endsWith("@g.us"),
-              quoted,
               reply: t => sock.sendMessage(remoteJid, { text: t }),
               bots
             },
