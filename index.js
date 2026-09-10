@@ -77,8 +77,13 @@ async function startBot(inputNumber) {
 
   if (bots.has(number)) {
     const existing = bots.get(number);
-    if (existing?.sock?.authState?.creds?.registered) return null;
-    // Un socket existe déjà mais n'est pas enregistré : on le ferme
+    // On ne se fie plus à authState.creds.registered seul : avec les versions
+    // récentes de Baileys (7.0.0-rc13/rc14), ce flag peut passer à true
+    // localement avant même que WhatsApp ait confirmé la liaison côté serveur
+    // (bug connu : https://github.com/WhiskeySockets/Baileys/issues/2737).
+    // Seul un événement connection.update === "open" prouve une vraie connexion.
+    if (existing?.linked) return null;
+    // Un socket existe déjà mais n'est pas réellement lié : on le ferme
     // avant d'en recréer un, pour éviter les doublons.
     await closeExistingSocket(existing);
     bots.delete(number);
@@ -116,7 +121,7 @@ async function startBot(inputNumber) {
     antilink: false
   };
 
-  bots.set(number, { sock, commands, config, features, sessionDir: SESSION_DIR });
+  bots.set(number, { sock, commands, config, features, sessionDir: SESSION_DIR, linked: false });
   console.log(chalk.blue(`[BOT] ${number} lancé`));
 
   sock.ev.on("messages.upsert", async ({ messages }) => {
@@ -232,7 +237,10 @@ async function startBot(inputNumber) {
   });
 
   sock.ev.on("connection.update", async ({ connection, lastDisconnect }) => {
+    const bot = bots.get(number);
+
     if (connection === "close") {
+      if (bot) bot.linked = false;
       const code = lastDisconnect?.error?.output?.statusCode;
 
       if (code === 401 || code === 403) {
@@ -249,6 +257,8 @@ async function startBot(inputNumber) {
         setTimeout(() => startBot(number).catch(e => console.log(chalk.red(`[BOT] reconnexion échouée : ${e.message}`))), 3000);
       }
     } else if (connection === "open") {
+      // Seul ce point confirme une vraie liaison WhatsApp.
+      if (bot) bot.linked = true;
       console.log(chalk.green(`[BOT] ${number} connecté`));
     }
   });
