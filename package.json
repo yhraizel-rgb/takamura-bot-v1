@@ -16,6 +16,7 @@
   "dependencies": {
     "@whiskeysockets/baileys": "^7.0.0-rc14",
     "awesome-phonenumber": "^7.8.0",
+    "axios": "^1.7.9",
     "bcryptjs": "^3.0.3",
     "bluebird": "^3.7.2",
     "body-parser": "^2.3.0",
