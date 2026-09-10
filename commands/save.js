@@ -7,7 +7,7 @@ export default {
 
   async execute(sock, message, args) {
     const { from, reply, isGroup, sender, raw } = message;
-    const selfJid = sock.user.id;
+    const selfJid = sock.user.id.split(":")[0] + "@s.whatsapp.net";
 
     try {
       // 📌 Message ciblé (reply ou direct)

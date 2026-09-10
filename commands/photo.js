@@ -8,11 +8,11 @@ export default {
     const { from, reply, quoted } = message;
 
     try {
-      if (!quoted?.message?.stickerMessage) {
+      if (!quoted?.stickerMessage) {
         return await reply("❌ Réponds à un sticker");
       }
 
-      const stream = await downloadContentFromMessage(quoted.message.stickerMessage, "sticker");
+      const stream = await downloadContentFromMessage(quoted.stickerMessage, "sticker");
       const chunks = [];
 
       for await (const chunk of stream) {
