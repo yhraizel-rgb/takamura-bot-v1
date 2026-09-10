@@ -17,7 +17,7 @@ export default {
     const query = !isNaN(lastArg) ? args.slice(0, -1).join(" ") : args.join(" ");
 
     try {
-      await sock.sendMessage(from, { text: `🖼️ Recherche de *${count}* image(s) pour : *${query}*...\n⏳ Veuillez patienter...` });
+      await sock.sendMessage(from, { text: `*_🖼️ Recherche de ${count} image(s) pour : "${query}"...\n⏳ Veuillez patienter..._*` });
 
       // ───── Requête Bing Images ─────
       const bingUrl = `https://www.bing.com/images/search?q=${encodeURIComponent(query)}&form=HDRSC2`;
@@ -29,7 +29,7 @@ export default {
         .filter(u => u.startsWith("http"));
 
       if (!imageUrls.length) {
-        return await reply(`⚠️ Aucune image trouvée pour : *${query}*`);
+        return await reply(`⚠️ Aucune image trouvée pour : "${query}"`);
       }
 
       // ───── Envoi des images ─────
@@ -43,7 +43,7 @@ export default {
 
           await sock.sendMessage(from, {
             image: buffer,
-            caption: `🖼️ ${query} (${i + 1}/${imagesToSend.length})`
+            caption: `*_🖼️ ${query} (${i + 1}/${imagesToSend.length})_*`
           });
 
           await new Promise(r => setTimeout(r, 1000));
@@ -52,7 +52,7 @@ export default {
         }
       }
 
-      await sock.sendMessage(from, { text: `✅ ${imagesToSend.length}/${count} image(s) envoyée(s) pour *${query}*.` });
+      await sock.sendMessage(from, { text: `*_✅ ${imagesToSend.length}/${count} image(s) envoyée(s) pour "${query}"._*` });
 
     } catch (err) {
       console.error("❌ Img error:", err);

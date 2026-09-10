@@ -1,7 +1,7 @@
 export default {
   name: "demoteall",
-  description: "𝙳𝚎𝚖𝚘𝚝𝚎 𝚊𝚕𝚕 𝚊𝚍𝚖𝚒𝚗𝚜 𝚎𝚡𝚌𝚎𝚙𝚝 𝚋𝚘𝚝, 𝚘𝚠𝚗𝚎𝚛𝚜, 𝚜𝚞𝚍𝚘 & 𝚋𝚘𝚝 𝙻𝙸𝙳",
-  
+  description: "Rétrograder tous les admins sauf le bot, les owners et le sudo",
+
   async execute(sock, message, args) {
     const { from, reply, raw, sender } = message;
 
@@ -29,19 +29,19 @@ export default {
         .map(p => p.id);
 
       if (toDemote.length === 0) {
-        return await reply("⚠️ 𝙽𝚘 admins to demote.");
+        return await reply("⚠️ Aucun admin à rétrograder.");
       }
 
       // --- Démote les cibles ---
       await sock.groupParticipantsUpdate(from, toDemote, "demote");
       await sock.sendMessage(from, { react: { text: "⬇️", key: raw.key } });
 
-      const teks = `⬇️ 𝙳𝚎𝚖𝚘𝚝𝚎𝚍 ${toDemote.map(t => `@${t.split("@")[0]}`).join(", ")} 𝚏𝚛𝚘𝚖 admin.\nRequested by: ${sender}`;
+      const teks = `*_⬇️ ${toDemote.map(t => `@${t.split("@")[0]}`).join(", ")} rétrogradé(s) en membre.\nDemandé par : ${sender.split("@")[0]}_*`;
       await sock.sendMessage(from, { text: teks, mentions: toDemote });
 
     } catch (err) {
       console.error("❌ demoteall error:", err);
-      await reply("❌ Can't demote admins. Check my permissions.");
+      await reply("❌ Impossible de rétrograder les admins. Vérifie mes permissions.");
     }
   }
 };
