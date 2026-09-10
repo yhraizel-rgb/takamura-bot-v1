@@ -1245,7 +1245,7 @@ const commands = [
 
       const menuText = `
 ┌─────────────────────────────┐
-│         *MR.SAMY BOT*         │
+│         *TAKAMURA-BOT-V1*         │
 └─────────────────────────────┘
 
 *Utilisateur* : ${userName}
@@ -1256,17 +1256,14 @@ const commands = [
 │ add
 │ demote
 │ demoteall
-│ desc
 │ gpp
 │ infosgroups
-│ invite
 │ kick
 │ kickall
 │ left
 │ link
 │ manga
 │ mute
-│ online
 │ promote
 │ promoteall
 │ purge
@@ -1275,35 +1272,18 @@ const commands = [
 └───────────────────────────────────────────────┘
 
 ┌─────────────── TÉLÉCHARGEMENTS ───────────────┐
-│ apk
-│ down-url
 │ img
 │ save
-│ telegram-sticker
-│ tiktok
-│ toaudio
 │ url
 │ vv
 └───────────────────────────────────────────────┘
 
 ┌─────────────── UTILITAIRES ───────────────┐
-│ ai
-│ news
-│ weather
-│ checkban
-│ country
-│ delete
-│ device
-│ dico
-│ infos
-│ meteo
 │ ping
 │ owner
 └───────────────────────────────────────────────┘
 
 ┌─────────────── MODÉRATION ───────────────┐
-│ block
-│ unblock
 │ autorecording
 │ autotyping
 │ autoread
@@ -1321,14 +1301,13 @@ const commands = [
 └───────────────────────────────────────────────┘
 
 ┌─────────────── TAGS ───────────────┐
-│ principal
 │ tag
 │ tagadmin
 │ tagall
 └───────────────────────────────────────────────┘
 
 ┌─────────────────────────────┐
-│   *Développé par MR._SAMY TOUT MIGNON *     │
+│   *Développé par  TAKAMURA *     │
 └─────────────────────────────┘
 `;
 
