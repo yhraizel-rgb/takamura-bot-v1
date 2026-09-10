@@ -14,7 +14,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "@whiskeysockets/baileys": "^7.0.0",
     "awesome-phonenumber": "^7.8.0",
     "bcryptjs": "^3.0.3",
     "bluebird": "^3.7.2",
