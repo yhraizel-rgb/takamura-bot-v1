@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAKAMURA BOT V1</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050505;
+    --bg-elev: #0d0d0f;
+    --surface: #121214;
+    --surface-hover: #17171a;
+    --border: #1f1f23;
+    --border-strong: #2a2a30;
+    --text: #f5f5f7;
+    --text-muted: #8a8a94;
+    --text-dim: #5a5a63;
+    --accent: #6366f1;
+    --accent-hover: #7c7ff2;
+    --accent-soft: rgba(99,102,241,0.12);
+    --success: #22c55e;
+    --success-soft: rgba(34,197,94,0.12);
+    --danger: #ef4444;
+    --danger-soft: rgba(239,68,68,0.12);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --sidebar-w: 260px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--accent); color: #fff; }
+
+  /* ============ LAYOUT ============ */
+  .app {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ============ SIDEBAR ============ */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg-elev);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 22px 16px;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 40;
+    transition: transform .25s ease;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px 22px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), #4338ca);
+    display: grid;
+    place-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+  .brand-title { font-size: 13px; font-weight: 700; letter-spacing: .5px; }
+  .brand-version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+  .nav-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text-dim);
+    padding: 14px 12px 8px;
+    font-weight: 600;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    transition: background .15s, color .15s;
+  }
+  .nav-item:hover { background: var(--surface-hover); color: var(--text); }
+  .nav-item.active {
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+  .nav-item.active .nav-dot { background: var(--accent); }
+
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border-strong);
+    flex-shrink: 0;
+    transition: background .15s;
+  }
+
+  .sidebar-footer {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+    display: inline-block;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  /* ============ MAIN ============ */
+  .main {
+    flex: 1;
+    margin-left: var(--sidebar-w);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .topbar {
+    height: 64px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    background: rgba(5,5,5,0.85);
+    backdrop-filter: blur(12px);
+    z-index: 30;
+  }
+  .topbar h2 { font-size: 15px; font-weight: 600; letter-spacing: .2px; }
+  .topbar-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: .5px;
+  }
+
+  .menu-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px; height: 36px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-right: 14px;
+  }
+
+  .content {
+    padding: 36px 32px 80px;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  .view { display: none; animation: fade .3s ease; }
+  .view.active { display: block; }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ TYPOGRAPHY ============ */
+  .page-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin-bottom: 6px;
+  }
+  .page-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  .section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin: 32px 0 14px;
+  }
+
+  /* ============ CARDS ============ */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .card h3 { font-size: 15px; font-weight: 600; }
+  .card p { color: var(--text-muted); font-size: 13.5px; }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* ============ FORM ============ */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 7px;
+    letter-spacing: .3px;
+  }
+  .field input {
+    width: 100%;
+    background: var(--bg-elev);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    outline: none;
+    transition: border .15s, box-shadow .15s;
+  }
+  .field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .field input::placeholder { color: var(--text-dim); }
+
+  /* ============ BUTTONS ============ */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background .15s, border .15s, transform .1s;
+    letter-spacing: .2px;
+  }
+  .btn:active { transform: scale(.98); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--accent-hover); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border-strong);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: var(--text-dim); }
+
+  .btn-success {
+    background: var(--success);
+    color: #041a0d;
+  }
+  .btn-success:hover { filter: brightness(1.1); }
+
+  /* ============ RESULT ============ */
+  .result {
+    display: none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13.5px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    animation: fade .3s ease;
+  }
+  .result.show { display: block; }
+  .result.info { background: var(--accent-soft); border-color: var(--accent); color: #c7c8fc; }
+  .result.ok { background: var(--success-soft); border-color: var(--success); color: #86efac; }
+  .result.err { background: var(--danger-soft); border-color: var(--danger); color: #fca5a5; }
+  .result code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(0,0,0,0.35);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #fff;
+  }
+
+  /* ============ FEATURE / COMMAND LIST ============ */
+  .list { display: flex; flex-direction: column; gap: 8px; }
+
+  .list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: border .15s, background .15s;
+  }
+  .list-item:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+
+  .cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: var(--accent-soft);
+    color: #a5a8fc;
+    padding: 4px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    border: 1px solid rgba(99,102,241,0.25);
+    min-width: 96px;
+    text-align: center;
+  }
+  .list-item .desc { font-size: 13.5px; color: var(--text-muted); }
+  .list-item .desc strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 2px; }
+
+  /* ============ STEPS / TUTORIAL ============ */
+  .steps { display: flex; flex-direction: column; gap: 0; }
+  .step {
+    display: flex;
+    gap: 16px;
+    padding-bottom: 26px;
+    position: relative;
+  }
+  .step:last-child { padding-bottom: 0; }
+  .step:not(:last-child)::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 34px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border-strong);
+  }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    display: grid;
+    place-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .step-body h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .step-body p { font-size: 13.5px; color: var(--text-muted); }
+
+  /* ============ ONBOARDING OVERLAY ============ */
+  .onboarding {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
+    display: grid;
+    place-items: center;
+    z-index: 100;
+    padding: 20px;
+    opacity: 1;
+    transition: opacity .3s ease;
+  }
+  .onboarding.hidden { opacity: 0; pointer-events: none; }
+
+  .ob-card {
+    background: var(--bg-elev);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    width: 100%;
+    max-width: 480px;
+    padding: 32px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+    animation: popIn .35s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(.94) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .ob-progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 22px;
+  }
+  .ob-bar {
+    height: 3px;
+    flex: 1;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .ob-bar span {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    transition: width .4s ease;
+  }
+  .ob-bar.done span, .ob-bar.active span { width: 100%; }
+
+  .ob-step-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .ob-card h2 {
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -.3px;
+    margin-bottom: 10px;
+  }
+  .ob-card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 26px;
+    min-height: 66px;
+  }
+
+  .ob-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .ob-actions .right { display: flex; gap: 10px; }
+
+  /* ============ ABOUT ============ */
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .meta-cell {
+    background: var(--surface);
+    padding: 16px 18px;
+  }
+  .meta-cell .k {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .meta-cell .v {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    color: var(--text);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 860px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+    .topbar { padding: 0 18px; }
+    .content { padding: 24px 18px 60px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .meta-grid { grid-template-columns: 1fr; }
+    .page-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">T</div>
+      <div class="brand-text">
+        <span class="brand-title">TAKAMURA BOT</span>
+        <span class="brand-version">Version 1</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-label">Général</div>
+      <button class="nav-item active" data-view="home">
+        <span class="nav-dot"></span> Accueil
+      </button>
+      <button class="nav-item" data-view="pair">
+        <span class="nav-dot"></span> Pairage
+      </button>
+
+      <div class="nav-label">Documentation</div>
+      <button class="nav-item" data-view="guide">
+        <span class="nav-dot"></span> Mode d'emploi
+      </button>
+      <button class="nav-item" data-view="features">
+        <span class="nav-dot"></span> Fonctionnalités
+      </button>
+      <button class="nav-item" data-view="commands">
+        <span class="nav-dot"></span> Commandes
+      </button>
+
+      <div class="nav-label">Informations</div>
+      <button class="nav-item" data-view="faq">
+        <span class="nav-dot"></span> FAQ
+      </button>
+      <button class="nav-item" data-view="about">
+        <span class="nav-dot"></span> À propos
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span><span class="status-dot"></span>Système actif</span>
+      <span>V1.0</span>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;">
+        <button class="menu-toggle" id="menuToggle" aria-label="Menu">≡</button>
+        <h2 id="viewTitle">Accueil</h2>
+      </div>
+      <div class="topbar-meta">TAKAMURA / CONSOLE</div>
+    </header>
+
+    <div class="content">
+
+      <!-- ===== HOME ===== -->
+      <section class="view active" id="view-home">
+        <h1 class="page-title">Bienvenue sur TAKAMURA BOT</h1>
+        <p class="page-sub">
+          Console de gestion pour votre bot WhatsApp. Connectez un compte,
+          consultez la documentation et pilotez vos fonctionnalités depuis une interface unique.
+        </p>
+
+        <div class="section-title">Démarrage rapide</div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Connecter votre compte</h3>
+            <span class="nav-dot" style="background:var(--accent)"></span>
+          </div>
+          <p style="margin-bottom:16px;">
+            Rendez-vous dans la section « Pairage », entrez votre numéro au format international
+            et récupérez un code à saisir sur WhatsApp pour activer le bot.
+          </p>
+          <button class="btn btn-primary" onclick="goTo('pair')">Ouvrir le pairage</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Documentation</h3>
+            <p style="margin:8px 0 14px;">Guide d'utilisation, fonctionnalités et commandes disponibles.</p>
+            <button class="btn btn-ghost" onclick="goTo('guide')">Consulter</button>
+          </div>
+          <div class="card">
+            <h3>FAQ</h3>
+            <p style="margin:8px 0 14px;">Réponses aux questions les plus fréquentes.</p>
+            <button class="btn btn-ghost" onclick="goTo('faq')">Voir</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PAIR ===== -->
+      <section class="view" id="view-pair">
+        <h1 class="page-title">Pairage du bot</h1>
+        <p class="page-sub">
+          Entrez le numéro WhatsApp du bot au format international, sans espaces ni symbole « + ».
+        </p>
+
+        <div class="card">
+          <div class="field">
+            <label for="phonePair">Numéro de téléphone</label>
+            <input id="phonePair" type="tel" placeholder="2376XXXXXXXX" autocomplete="off">
+          </div>
+          <button id="pairBtn" class="btn btn-primary">Générer le code de pairage</button>
+          <div id="pairResult" class="result"></div>
+          <button id="copyBtn" class="btn btn-success" style="display:none; margin-top:12px;">Copier le code</button>
+        </div>
+
+        <div class="section-title">Comment ça marche</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <h4>Saisir le numéro</h4>
+              <p>Indiquez le numéro au format international (exemple : 2376XXXXXXXX).</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <h4>Générer le code</h4>
+              <p>Cliquez sur « Générer ». Un code à 8 caractères apparaît en quelques secondes.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-body">
+              <h4>Associer sur WhatsApp</h4>
+              <p>
+                Ouvrez WhatsApp, allez dans « Appareils connectés », choisissez
+                « Associer avec un numéro de téléphone » et saisissez le code.
+              </p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">04</div>
+            <div class="step-body">
+              <h4>Connexion établie</h4>
+              <p>Le bot se connecte automatiquement dès que le code est validé.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== GUIDE ===== -->
+      <section class="view" id="view-guide">
+        <h1 class="page-title">Mode d'emploi</h1>
+        <p class="page-sub">Suivez ces étapes pour configurer et utiliser TAKAMURA BOT correctement.</p>
+
+        <div class="section-title">Étape 1 — Pairage</div>
+        <div class="card">
+          <p>
+            Connectez votre compte via la section Pairage. Le code généré doit être utilisé
+            immédiatement, il expire au bout de quelques minutes.
+          </p>
+        </div>
+
+        <div class="section-title">Étape 2 — Activation des fonctionnalités</div>
+        <div class="card">
+          <p>
+            Depuis WhatsApp, envoyez une commande de type
+            <span class="cmd" style="display:inline-block;margin:0 4px;">.autoread on</span>
+            pour activer une fonctionnalité. Utilisez <span class="cmd" style="display:inline-block;margin:0 4px;">off</span>
+            pour la désactiver.
+          </p>
+        </div>
+
+        <div class="section-title">Étape 3 — Commandes du bot</div>
+        <div class="card">
+          <p>
+            Toutes les commandes commencent par le préfixe défini (par défaut : <strong>.</str
