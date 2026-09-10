@@ -150,12 +150,12 @@ async function startBot(inputNumber) {
       if (cmdName && Object.prototype.hasOwnProperty.call(bot.features, cmdName)) {
         if (!["on", "off"].includes(args[0])) {
           return sock.sendMessage(remoteJid, {
-            text: `Usage : ${prefix}${cmdName} on/off`
+            text: `*_Usage : ${prefix}${cmdName} on/off_*`
           });
         }
         bot.features[cmdName] = args[0] === "on";
         return sock.sendMessage(remoteJid, {
-          text: `Fonctionnalité ${cmdName} : ${args[0]}`
+          text: `*_Fonctionnalité ${cmdName} : ${args[0]}_*`
         });
       }
 
@@ -168,15 +168,22 @@ async function startBot(inputNumber) {
               from: remoteJid,
               sender: participant,
               isGroup: remoteJid.endsWith("@g.us"),
-              reply: t => sock.sendMessage(remoteJid, { text: t }),
+              // Toutes les réponses des commandes sont automatiquement
+              // mises en forme en gras + italique (style WhatsApp).
+              reply: t => sock.sendMessage(remoteJid, { text: `*_${t}_*` }),
               bots
             },
             args
           );
+
+          // Réaction 🐉 automatique sous le message de la commande exécutée.
+          await sock.sendMessage(remoteJid, {
+            react: { text: "🐉", key: msg.key }
+          });
         } catch (e) {
           console.error(e);
           sock.sendMessage(remoteJid, {
-            text: "Erreur lors de l'exécution de la commande."
+            text: "*_Erreur lors de l'exécution de la commande._*"
           });
         }
       }
