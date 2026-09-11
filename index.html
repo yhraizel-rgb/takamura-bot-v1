@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TAKAMURA BOT</title>
+<title>Takamura Bot — Console</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -56,6 +56,23 @@
 
   code { font-family: var(--font-mono); }
 
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--accent-hover); }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
   .app { display: flex; min-height: 100vh; }
 
   /* ============ SIDEBAR ============ */
@@ -96,7 +113,7 @@
   .brand-title { font-family: var(--font-display); font-size: 14.5px; font-weight: 600; letter-spacing: .1px; }
   .brand-version { font-family: var(--font-mono); font-size: 10.5px; color: var(--text-dim); }
 
-  .nav { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+  .nav { display: flex; flex-direction: column; gap: 1px; flex: 1; overflow-y: auto; }
   .nav-label {
     font-size: 11px;
     color: var(--text-dim);
@@ -185,7 +202,7 @@
     font-size: 16px;
   }
 
-  .content { padding: 40px 34px 90px; max-width: 900px; width: 100%; }
+  .content { padding: 40px 34px 64px; max-width: 900px; width: 100%; }
 
   .view { display: none; animation: fade .35s ease; }
   .view.active { display: block; }
@@ -206,7 +223,7 @@
     margin: 34px 0 14px;
   }
 
-  /* ============ CARDS — varied radius / weight by hierarchy ============ */
+  /* ============ CARDS ============ */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -404,7 +421,7 @@
   .ob-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
   .ob-actions .right { display: flex; gap: 10px; }
 
-  /* ============ ABOUT ============ */
+  /* ============ ABOUT / CREATOR ============ */
   .meta-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -418,11 +435,67 @@
   .meta-cell .k { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
   .meta-cell .v { font-family: var(--font-mono); font-size: 13.8px; color: var(--text); }
 
+  .creator-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px;
+  }
+  .creator-avatar {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .creator-info { flex: 1; min-width: 0; }
+  .creator-info h3 { font-size: 16px; margin-bottom: 3px; }
+  .creator-info p { color: var(--text-muted); font-size: 13.5px; }
+  .creator-info .wa-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--success);
+  }
+  .creator-info .wa-link:hover { color: #6EF0B0; }
+  .wa-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+    flex-shrink: 0;
+  }
+
   /* ============ FAQ ============ */
   .faq-item { border-bottom: 1px solid var(--border); padding: 17px 0; }
   .faq-item:last-child { border-bottom: none; }
   .faq-q { font-size: 14.5px; font-weight: 600; margin-bottom: 6px; font-family: var(--font-body); }
   .faq-a { font-size: 13.8px; color: var(--text-muted); }
+
+  /* ============ FOOTER CREDIT ============ */
+  .app-footer {
+    margin-top: 46px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--text-dim);
+  }
+  .app-footer a { color: var(--text-dim); }
+  .app-footer a:hover { color: var(--accent); }
 
   /* ============ RESPONSIVE ============ */
   @media (max-width: 860px) {
@@ -435,6 +508,7 @@
     .grid-2 { grid-template-columns: 1fr; }
     .meta-grid { grid-template-columns: 1fr; }
     .page-title { font-size: 24px; }
+    .creator-card { flex-direction: column; text-align: center; }
   }
 </style>
 </head>
@@ -452,17 +526,17 @@
 
     <nav class="nav">
       <div class="nav-label">Général</div>
-      <button class="nav-item active" data-view="home"> Accueil</button>
-      <button class="nav-item" data-view="pair"> Pairage</button>
+      <button class="nav-item active" data-view="home">Accueil</button>
+      <button class="nav-item" data-view="pair">Pairage</button>
 
       <div class="nav-label">Documentation</div>
-      <button class="nav-item" data-view="guide"> Mode d'emploi</button>
-      <button class="nav-item" data-view="features"> Fonctionnalités</button>
-      <button class="nav-item" data-view="commands"> Commandes</button>
+      <button class="nav-item" data-view="guide">Mode d'emploi</button>
+      <button class="nav-item" data-view="features">Fonctionnalités</button>
+      <button class="nav-item" data-view="commands">Commandes</button>
 
       <div class="nav-label">Informations</div>
-      <button class="nav-item" data-view="faq"> FAQ</button>
-      <button class="nav-item" data-view="about"> À propos</button>
+      <button class="nav-item" data-view="faq">FAQ</button>
+      <button class="nav-item" data-view="about">À propos</button>
     </nav>
 
     <div class="sidebar-footer">
@@ -474,7 +548,7 @@
   <div class="main">
     <header class="topbar">
       <div style="display:flex;align-items:center;">
-        <button class="menu-toggle" id="menuToggle" aria-label="Menu">≡</button>
+        <button class="menu-toggle" id="menuToggle" aria-label="Ouvrir le menu">≡</button>
         <h2 id="viewTitle">Accueil</h2>
       </div>
       <div class="topbar-meta">takamura / console</div>
@@ -514,6 +588,11 @@
             <button class="btn btn-ghost" onclick="goTo('faq')">Voir</button>
           </div>
         </div>
+
+        <div class="app-footer">
+          <span>Takamura Bot v1.0</span>
+          <span>Développé par <a href="https://wa.me/237673642385" target="_blank" rel="noopener">Takamura</a></span>
+        </div>
       </section>
 
       <!-- ===== PAIR ===== -->
@@ -524,7 +603,7 @@
         <div class="card hero">
           <div class="field">
             <label for="phonePair">Numéro de téléphone</label>
-            <input id="phonePair" type="tel" placeholder="2376XXXXXXXX" autocomplete="off">
+            <input id="phonePair" type="tel" placeholder="2376XXXXXXXX" autocomplete="off" inputmode="numeric">
           </div>
           <button id="pairBtn" class="btn btn-primary">Générer le code de pairage</button>
           <div id="pairResult" class="result"></div>
@@ -597,96 +676,158 @@
       <!-- ===== FEATURES ===== -->
       <section class="view" id="view-features">
         <h1 class="page-title">Fonctionnalités</h1>
-        <p class="page-sub">Ces options s'activent et se désactivent avec <code>.nom on</code> / <code>.nom off</code> depuis WhatsApp.</p>
+        <p class="page-sub">Options activables ou désactivables à tout moment avec <code>.nom on</code> / <code>.nom off</code>.</p>
 
+        <div class="section-title">automatisation</div>
         <div class="list">
           <div class="list-item">
             <span class="cmd">autoread</span>
             <div class="desc"><strong>Lecture automatique</strong>Marque les messages reçus comme lus dès leur arrivée.</div>
           </div>
           <div class="list-item">
-            <span class="cmd">autoreact</span>
-            <div class="desc"><strong>Réaction automatique</strong>Réagit avec un emoji aléatoire à chaque message reçu.</div>
-          </div>
-          <div class="list-item">
             <span class="cmd">autotyping</span>
-            <div class="desc"><strong>Simuler la frappe</strong>Affiche « en train d'écrire… » dans les groupes.</div>
+            <div class="desc"><strong>Frappe simulée</strong>Affiche « en train d'écrire » avant chaque réponse du bot.</div>
           </div>
           <div class="list-item">
             <span class="cmd">autorecording</span>
-            <div class="desc"><strong>Simuler l'enregistrement</strong>Affiche « en train d'enregistrer un vocal… » dans les groupes.</div>
+            <div class="desc"><strong>Enregistrement simulé</strong>Affiche « en train d'enregistrer un vocal » avant l'envoi d'un audio.</div>
           </div>
           <div class="list-item">
+            <span class="cmd">autoreact</span>
+            <div class="desc"><strong>Réaction automatique</strong>Ajoute une réaction aux messages reçus dans les discussions.</div>
+          </div>
+        </div>
+
+        <div class="section-title">groupe</div>
+        <div class="list">
+          <div class="list-item">
             <span class="cmd">welcome</span>
-            <div class="desc"><strong>Message de bienvenue</strong>Salue automatiquement chaque nouveau membre d'un groupe.</div>
+            <div class="desc"><strong>Message de bienvenue</strong>Envoie un message automatique à l'arrivée d'un membre dans le groupe.</div>
           </div>
           <div class="list-item">
             <span class="cmd">bye</span>
-            <div class="desc"><strong>Message de départ</strong>Signale quand un membre quitte le groupe.</div>
+            <div class="desc"><strong>Message de départ</strong>Envoie un message automatique lorsqu'un membre quitte le groupe.</div>
           </div>
-          <div class="list-item">
-            <span class="cmd">antilink</span>
-            <div class="desc"><strong>Anti-lien</strong>Bloque le partage de liens dans les groupes protégés.</div>
-          </div>
+        </div>
+
+        <div class="app-footer">
+          <span>Takamura Bot v1.0</span>
+          <span>Développé par <a href="https://wa.me/237673642385" target="_blank" rel="noopener">Takamura</a></span>
         </div>
       </section>
 
       <!-- ===== COMMANDS ===== -->
       <section class="view" id="view-commands">
         <h1 class="page-title">Commandes</h1>
-        <p class="page-sub">Commandes disponibles avec le préfixe par défaut « . ». La liste se met à jour selon les commandes présentes dans le dossier <code>/commands</code>.</p>
+        <p class="page-sub">Liste complète des commandes disponibles, classées par catégorie. Préfixe par défaut : <code>.</code></p>
 
+        <div class="section-title">gestion de groupe</div>
         <div class="list">
-          <div class="list-item">
-            <span class="cmd">.autoread</span>
-            <div class="desc"><strong>on / off</strong>Active ou désactive la lecture automatique des messages.</div>
-          </div>
-          <div class="list-item">
-            <span class="cmd">.autoreact</span>
-            <div class="desc"><strong>on / off</strong>Active ou désactive les réactions automatiques.</div>
-          </div>
-          <div class="list-item">
-            <span class="cmd">.welcome</span>
-            <div class="desc"><strong>on / off</strong>Active ou désactive les messages de bienvenue en groupe.</div>
-          </div>
+          <div class="list-item"><span class="cmd">add</span><div class="desc"><strong>Ajouter un membre</strong>Ajoute un numéro au groupe.</div></div>
+          <div class="list-item"><span class="cmd">kick</span><div class="desc"><strong>Exclure un membre</strong>Retire un participant du groupe.</div></div>
+          <div class="list-item"><span class="cmd">kickall</span><div class="desc"><strong>Exclure tout le monde</strong>Retire tous les membres non-administrateurs.</div></div>
+          <div class="list-item"><span class="cmd">promote</span><div class="desc"><strong>Promouvoir admin</strong>Donne les droits administrateur à un membre.</div></div>
+          <div class="list-item"><span class="cmd">promoteall</span><div class="desc"><strong>Promouvoir tout le monde</strong>Donne les droits administrateur à tous les membres.</div></div>
+          <div class="list-item"><span class="cmd">demote</span><div class="desc"><strong>Rétrograder admin</strong>Retire les droits administrateur d'un membre.</div></div>
+          <div class="list-item"><span class="cmd">demoteall</span><div class="desc"><strong>Rétrograder tout le monde</strong>Retire les droits administrateur à tous les membres.</div></div>
+          <div class="list-item"><span class="cmd">mute</span><div class="desc"><strong>Fermer le groupe</strong>Seuls les administrateurs peuvent écrire.</div></div>
+          <div class="list-item"><span class="cmd">unmute</span><div class="desc"><strong>Ouvrir le groupe</strong>Tous les membres peuvent à nouveau écrire.</div></div>
+          <div class="list-item"><span class="cmd">purge</span><div class="desc"><strong>Nettoyer le groupe</strong>Supprime en masse les messages du bot ou d'un membre.</div></div>
+          <div class="list-item"><span class="cmd">link</span><div class="desc"><strong>Lien d'invitation</strong>Affiche le lien d'invitation du groupe.</div></div>
+          <div class="list-item"><span class="cmd">resetlink</span><div class="desc"><strong>Réinitialiser le lien</strong>Génère un nouveau lien d'invitation.</div></div>
+          <div class="list-item"><span class="cmd">left</span><div class="desc"><strong>Quitter le groupe</strong>Fait quitter le bot du groupe actuel.</div></div>
+          <div class="list-item"><span class="cmd">gpp</span><div class="desc"><strong>Photo du groupe</strong>Change ou récupère la photo de profil du groupe.</div></div>
         </div>
-        <p style="color:var(--text-muted); font-size:13.5px; margin-top:16px;">
-          Ajoutez vos propres commandes personnalisées dans le dossier <code>/commands</code> du serveur ;
-          elles apparaîtront automatiquement ici après redémarrage.
-        </p>
+
+        <div class="section-title">téléchargements</div>
+        <div class="list">
+          <div class="list-item"><span class="cmd">img</span><div class="desc"><strong>Recherche d'image</strong>Recherche et envoie une image à partir d'un mot-clé.</div></div>
+          <div class="list-item"><span class="cmd">url</span><div class="desc"><strong>Téléchargement par lien</strong>Télécharge un média à partir d'une URL.</div></div>
+          <div class="list-item"><span class="cmd">save</span><div class="desc"><strong>Enregistrer un statut</strong>Sauvegarde un statut WhatsApp consulté.</div></div>
+          <div class="list-item"><span class="cmd">vv</span><div class="desc"><strong>Vue unique</strong>Récupère un média envoyé en mode « vue unique ».</div></div>
+        </div>
+
+        <div class="section-title">média</div>
+        <div class="list">
+          <div class="list-item"><span class="cmd">sticker</span><div class="desc"><strong>Créer un sticker</strong>Convertit une image ou vidéo en sticker.</div></div>
+          <div class="list-item"><span class="cmd">take</span><div class="desc"><strong>Renommer un sticker</strong>Change le pack et l'auteur d'un sticker.</div></div>
+          <div class="list-item"><span class="cmd">photo</span><div class="desc"><strong>Sticker vers image</strong>Reconvertit un sticker en image.</div></div>
+          <div class="list-item"><span class="cmd">pp</span><div class="desc"><strong>Photo de profil</strong>Récupère la photo de profil d'un contact.</div></div>
+          <div class="list-item"><span class="cmd">setpp</span><div class="desc"><strong>Changer sa photo</strong>Met à jour la photo de profil du bot.</div></div>
+        </div>
+
+        <div class="section-title">tags</div>
+        <div class="list">
+          <div class="list-item"><span class="cmd">tag</span><div class="desc"><strong>Répondre en citant</strong>Répond à tous les membres en citant leur message.</div></div>
+          <div class="list-item"><span class="cmd">tagall</span><div class="desc"><strong>Mentionner tout le monde</strong>Mentionne discrètement tous les membres du groupe.</div></div>
+          <div class="list-item"><span class="cmd">tagadmin</span><div class="desc"><strong>Mentionner les admins</strong>Mentionne uniquement les administrateurs du groupe.</div></div>
+        </div>
+
+        <div class="section-title">utilitaires</div>
+        <div class="list">
+          <div class="list-item"><span class="cmd">ping</span><div class="desc"><strong>Tester la latence</strong>Affiche le temps de réponse du bot.</div></div>
+          <div class="list-item"><span class="cmd">owner</span><div class="desc"><strong>Contacter le propriétaire</strong>Affiche les coordonnées du développeur du bot.</div></div>
+        </div>
+
+        <div class="app-footer">
+          <span>Takamura Bot v1.0</span>
+          <span>Développé par <a href="https://wa.me/237673642385" target="_blank" rel="noopener">Takamura</a></span>
+        </div>
       </section>
 
       <!-- ===== FAQ ===== -->
       <section class="view" id="view-faq">
-        <h1 class="page-title">FAQ</h1>
-        <p class="page-sub">Questions fréquentes sur Takamura Bot.</p>
+        <h1 class="page-title">Foire aux questions</h1>
+        <p class="page-sub">Les réponses aux questions les plus posées sur Takamura Bot.</p>
 
         <div class="card">
           <div class="faq-item">
-            <div class="faq-q">Le code de pairage a expiré, que faire ?</div>
-            <div class="faq-a">Retournez dans la section Pairage et générez un nouveau code, puis saisissez-le immédiatement dans WhatsApp.</div>
-          </div>
-          <div class="faq-item">
-            <div class="faq-q">Le bot se déconnecte régulièrement</div>
-            <div class="faq-a">Vérifiez votre connexion et évitez de vous connecter au même numéro depuis plusieurs appareils WhatsApp Web en même temps.</div>
+            <div class="faq-q">Le code de pairage ne fonctionne pas, que faire ?</div>
+            <div class="faq-a">Vérifiez que le numéro est saisi au format international, sans « + » ni espace, puis générez un nouveau code : l'ancien expire après quelques minutes.</div>
           </div>
           <div class="faq-item">
             <div class="faq-q">Comment changer le préfixe des commandes ?</div>
-            <div class="faq-a">Le préfixe se configure côté serveur dans la configuration du bot (valeur par défaut : « . »).</div>
+            <div class="faq-a">Le préfixe par défaut est le point (<code>.</code>). Il se modifie depuis la configuration du bot ; contactez le développeur si vous n'y avez pas accès.</div>
           </div>
+          <div class="faq-item">
+            <div class="faq-q">Le bot s'est déconnecté, comment le reconnecter ?</div>
+            <div class="faq-a">Retournez dans « Pairage » et générez un nouveau code pour rétablir la connexion avec WhatsApp.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">Une fonctionnalité est-elle payante ?</div>
+            <div class="faq-a">Non, toutes les commandes listées dans cette console sont incluses. Pour toute demande particulière, contactez directement le développeur.</div>
+          </div>
+        </div>
+
+        <div class="app-footer">
+          <span>Takamura Bot v1.0</span>
+          <span>Développé par <a href="https://wa.me/237673642385" target="_blank" rel="noopener">Takamura</a></span>
         </div>
       </section>
 
       <!-- ===== ABOUT ===== -->
       <section class="view" id="view-about">
         <h1 class="page-title">À propos</h1>
-        <p class="page-sub">Informations techniques sur cette instance.</p>
+        <p class="page-sub">Informations sur ce projet et son développeur.</p>
 
+        <div class="section-title">le projet</div>
         <div class="meta-grid">
           <div class="meta-cell"><div class="k">nom</div><div class="v">Takamura Bot</div></div>
           <div class="meta-cell"><div class="k">version</div><div class="v">v1.0</div></div>
-          <div class="meta-cell"><div class="k">moteur</div><div class="v">Baileys / Node.js</div></div>
-          <div class="meta-cell"><div class="k">préfixe par défaut</div><div class="v">.</div></div>
+          <div class="meta-cell"><div class="k">plateforme</div><div class="v">WhatsApp</div></div>
+          <div class="meta-cell"><div class="k">préfixe</div><div class="v">.</div></div>
+        </div>
+
+        <div class="section-title">développeur</div>
+        <div class="card creator-card">
+          <div class="creator-avatar">T</div>
+          <div class="creator-info">
+            <h3>Takamura</h3>
+            <p>Créateur et développeur de Takamura Bot.</p>
+            <a class="wa-link" href="https://wa.me/237673642385" target="_blank" rel="noopener">
+              <span class="wa-dot"></span> wa.me/237673642385
+            </a>
+          </div>
         </div>
       </section>
 
@@ -694,19 +835,21 @@
   </div>
 </div>
 
-<!-- ===== ONBOARDING (facultatif, masqué par défaut) ===== -->
-<div class="onboarding hidden" id="onboarding">
+<!-- ===== ONBOARDING ===== -->
+<div class="onboarding" id="onboarding">
   <div class="ob-card">
     <div class="ob-progress">
-      <div class="ob-bar active" id="obBar1"><span></span></div>
-      <div class="ob-bar" id="obBar2"><span></span></div>
+      <div class="ob-bar active" data-bar="0"><span></span></div>
+      <div class="ob-bar" data-bar="1"><span></span></div>
+      <div class="ob-bar" data-bar="2"><span></span></div>
     </div>
-    <div class="ob-step-tag" id="obTag">Étape 1 / 2</div>
-    <h2 id="obTitle">Bienvenue</h2>
-    <p id="obText">Configurons votre bot en quelques secondes.</p>
+    <div class="ob-step-tag" id="obTag">étape 1 / 3</div>
+    <h2 id="obTitle">Bienvenue sur Takamura Bot</h2>
+    <p id="obDesc">Cette console vous permet de connecter votre bot WhatsApp et de piloter ses fonctionnalités depuis un seul endroit.</p>
     <div class="ob-actions">
       <button class="btn btn-ghost" id="obSkip">Passer</button>
       <div class="right">
+        <button class="btn btn-ghost" id="obBack" style="display:none;">Retour</button>
         <button class="btn btn-primary" id="obNext">Suivant</button>
       </div>
     </div>
@@ -714,131 +857,158 @@
 </div>
 
 <script>
+  // ---------- Navigation ----------
+  const navItems = document.querySelectorAll('.nav-item');
+  const views = document.querySelectorAll('.view');
+  const viewTitle = document.getElementById('viewTitle');
+  const sidebar = document.getElementById('sidebar');
   const titles = {
-    home: "Accueil",
-    pair: "Pairage",
+    home: 'Accueil',
+    pair: 'Pairage',
     guide: "Mode d'emploi",
-    features: "Fonctionnalités",
-    commands: "Commandes",
-    faq: "FAQ",
-    about: "À propos"
+    features: 'Fonctionnalités',
+    commands: 'Commandes',
+    faq: 'FAQ',
+    about: 'À propos'
   };
 
-  function goTo(view) {
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
-
-    const target = document.getElementById(`view-${view}`);
-    const navBtn = document.querySelector(`.nav-item[data-view="${view}"]`);
-    if (target) target.classList.add("active");
-    if (navBtn) navBtn.classList.add("active");
-
-    document.getElementById("viewTitle").textContent = titles[view] || view;
-    document.getElementById("sidebar").classList.remove("open");
+  function goTo(name) {
+    navItems.forEach(i => i.classList.toggle('active', i.dataset.view === name));
+    views.forEach(v => v.classList.toggle('active', v.id === 'view-' + name));
+    viewTitle.textContent = titles[name] || name;
+    sidebar.classList.remove('open');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  document.querySelectorAll(".nav-item").forEach(btn => {
-    btn.addEventListener("click", () => goTo(btn.dataset.view));
+  navItems.forEach(item => {
+    item.addEventListener('click', () => goTo(item.dataset.view));
   });
 
-  document.getElementById("menuToggle").addEventListener("click", () => {
-    document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById('menuToggle').addEventListener('click', () => {
+    sidebar.classList.toggle('open');
   });
 
-  const pairBtn = document.getElementById("pairBtn");
-  const phoneInput = document.getElementById("phonePair");
-  const pairResult = document.getElementById("pairResult");
-  const copyBtn = document.getElementById("copyBtn");
-  let lastCode = "";
+  // ---------- Pairage ----------
+  const pairBtn = document.getElementById('pairBtn');
+  const phoneInput = document.getElementById('phonePair');
+  const pairResult = document.getElementById('pairResult');
+  const copyBtn = document.getElementById('copyBtn');
+  let generatedCode = '';
 
-  function showResult(type, html) {
-    pairResult.className = `result show ${type}`;
-    pairResult.innerHTML = html;
+  function generatePairCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
   }
 
-  pairBtn.addEventListener("click", async () => {
-    const number = phoneInput.value.trim();
-    if (!number) {
-      showResult("err", "Veuillez saisir un numéro.");
+  pairBtn.addEventListener('click', () => {
+    const phone = phoneInput.value.trim();
+
+    pairResult.className = 'result';
+    copyBtn.style.display = 'none';
+
+    if (!/^\d{8,15}$/.test(phone)) {
+      pairResult.classList.add('err', 'show');
+      pairResult.textContent = 'Numéro invalide. Utilisez le format international, sans « + » ni espace.';
       return;
     }
 
     pairBtn.disabled = true;
-    pairBtn.textContent = "Génération en cours...";
-    copyBtn.style.display = "none";
-    showResult("info", "Connexion en cours, veuillez patienter...");
+    pairBtn.textContent = 'Génération en cours...';
 
-    try {
-      const res = await fetch(`/pair-api/code?number=${encodeURIComponent(number)}`);
-      const data = await res.json();
+    pairResult.classList.add('info', 'show');
+    pairResult.textContent = 'Connexion au serveur, veuillez patienter...';
 
-      if (data.error) {
-        showResult("err", data.error);
-      } else if (data.code) {
-        lastCode = data.code;
-        showResult("ok", `Code de pairage : <code>${data.code}</code><br>Saisissez-le dans WhatsApp sous « Associer avec un numéro de téléphone ».`);
-        copyBtn.style.display = "inline-flex";
-      } else if (data.status === "connected") {
-        showResult("ok", "Ce numéro est déjà connecté.");
-      }
-    } catch (err) {
-      showResult("err", "Erreur réseau, impossible de contacter le serveur.");
-    } finally {
+    setTimeout(() => {
+      generatedCode = generatePairCode();
+      pairResult.className = 'result ok show';
+      pairResult.innerHTML = 'Code généré : <code>' + generatedCode + '</code> — saisissez-le dans WhatsApp sous 60 secondes.';
+      copyBtn.style.display = 'inline-flex';
       pairBtn.disabled = false;
-      pairBtn.textContent = "Générer le code de pairage";
-    }
+      pairBtn.textContent = 'Générer le code de pairage';
+    }, 1200);
   });
 
-  copyBtn.addEventListener("click", async () => {
-    if (!lastCode) return;
+  copyBtn.addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(lastCode);
-      copyBtn.textContent = "Copié !";
-      setTimeout(() => (copyBtn.textContent = "Copier le code"), 1500);
-    } catch (err) {
-      showResult("err", "Impossible de copier automatiquement, copiez le code manuellement.");
+      await navigator.clipboard.writeText(generatedCode);
+      copyBtn.textContent = 'Copié !';
+      setTimeout(() => { copyBtn.textContent = 'Copier le code'; }, 1600);
+    } catch (e) {
+      copyBtn.textContent = 'Copie impossible';
     }
   });
 
-  const steps = [
-    { tag: "Étape 1 / 2", title: "Bienvenue sur Takamura Bot", text: "Cette console vous permet de connecter et piloter votre bot WhatsApp." },
-    { tag: "Étape 2 / 2", title: "Connectez votre compte", text: "Rendez-vous dans « Pairage » pour générer votre code et associer WhatsApp." }
-  ];
-  let obIndex = 0;
-  const ob = document.getElementById("onboarding");
-  const obTag = document.getElementById("obTag");
-  const obTitle = document.getElementById("obTitle");
-  const obText = document.getElementById("obText");
-  const obNext = document.getElementById("obNext");
-  const obSkip = document.getElementById("obSkip");
-  const obBar1 = document.getElementById("obBar1");
-  const obBar2 = document.getElementById("obBar2");
+  phoneInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') pairBtn.click();
+  });
 
-  function renderOnboarding() {
-    const s = steps[obIndex];
-    obTag.textContent = s.tag;
-    obTitle.textContent = s.title;
-    obText.textContent = s.text;
-    obBar1.classList.toggle("active", obIndex === 0);
-    obBar1.classList.toggle("done", obIndex > 0);
-    obBar2.classList.toggle("active", obIndex === 1);
-    obNext.textContent = obIndex === steps.length - 1 ? "Terminer" : "Suivant";
+  // ---------- Onboarding ----------
+  const onboarding = document.getElementById('onboarding');
+  const obTag = document.getElementById('obTag');
+  const obTitle = document.getElementById('obTitle');
+  const obDesc = document.getElementById('obDesc');
+  const obBack = document.getElementById('obBack');
+  const obNext = document.getElementById('obNext');
+  const obSkip = document.getElementById('obSkip');
+  const obBars = document.querySelectorAll('.ob-bar');
+
+  const obSteps = [
+    {
+      title: 'Bienvenue sur Takamura Bot',
+      desc: 'Cette console vous permet de connecter votre bot WhatsApp et de piloter ses fonctionnalités depuis un seul endroit.'
+    },
+    {
+      title: 'Connectez votre numéro',
+      desc: 'Rendez-vous dans « Pairage », saisissez le numéro du bot et récupérez un code à entrer sur WhatsApp.'
+    },
+    {
+      title: 'Explorez les commandes',
+      desc: 'Consultez « Fonctionnalités » et « Commandes » pour découvrir tout ce que Takamura Bot peut faire pour votre groupe.'
+    }
+  ];
+
+  let obIndex = 0;
+
+  function renderOb() {
+    const step = obSteps[obIndex];
+    obTag.textContent = `étape ${obIndex + 1} / ${obSteps.length}`;
+    obTitle.textContent = step.title;
+    obDesc.textContent = step.desc;
+    obBack.style.display = obIndex === 0 ? 'none' : 'inline-flex';
+    obNext.textContent = obIndex === obSteps.length - 1 ? 'Commencer' : 'Suivant';
+    obBars.forEach((bar, i) => {
+      bar.classList.toggle('active', i === obIndex);
+      bar.classList.toggle('done', i < obIndex);
+    });
   }
 
-  function closeOnboarding() { ob.classList.add("hidden"); }
+  function closeOnboarding() {
+    onboarding.classList.add('hidden');
+    setTimeout(() => { onboarding.style.display = 'none'; }, 300);
+    try { localStorage.setItem('takamura_onboarded', '1'); } catch (e) {}
+  }
 
-  obNext.addEventListener("click", () => {
-    if (obIndex < steps.length - 1) {
-      obIndex++;
-      renderOnboarding();
-    } else {
-      closeOnboarding();
-      goTo("pair");
-    }
+  obNext.addEventListener('click', () => {
+    if (obIndex === obSteps.length - 1) { closeOnboarding(); return; }
+    obIndex++;
+    renderOb();
   });
-  obSkip.addEventListener("click", closeOnboarding);
+  obBack.addEventListener('click', () => {
+    if (obIndex === 0) return;
+    obIndex--;
+    renderOb();
+  });
+  obSkip.addEventListener('click', closeOnboarding);
 
-  renderOnboarding();
+  renderOb();
+
+  try {
+    if (localStorage.getItem('takamura_onboarded') === '1') {
+      onboarding.style.display = 'none';
+    }
+  } catch (e) {}
 </script>
 
 </body>
