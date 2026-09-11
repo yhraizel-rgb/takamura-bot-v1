@@ -6,107 +6,83 @@ export default {
   description: "Afficher le menu complet",
 
   async execute(sock, message, args) {
-    const { from, sender, isGroup, bots } = message;
+    const { from, isGroup, bots } = message;
 
     const bot = Array.from(bots?.values() || []).find(
       b => b.sock?.user?.id?.split(":")[0] === from.split("@")[0]
     );
 
     const chatType = isGroup ? "Groupe" : "Privé";
-    const userName = sender ? sender.split("@")[0] : "Invité";
     const prefix = bot?.config?.prefix || ".";
 
     const menuText = `
-┌─────────────────────────────┐
-│         *MR.SAMY BOT*         │
-└─────────────────────────────┘
+╭─❖───────────────────❖─╮
+   _*TAKAMURA BOT V1*_
+╰─❖───────────────────❖─╯
 
-*Utilisateur* : ${userName}
-*Chat*        : ${chatType}
-*Préfixe*     : ${prefix}
+▸ _*Chat*_        : ${chatType}
+▸ _*Préfixe*_     : ${prefix}
 
-┌─────────────── GESTION DE GROUPE ───────────────┐
-│ add
-│ demote
-│ demoteall
-│ desc
-│ gpp
-│ infosgroups
-│ invite
-│ kick
-│ kickall
-│ left
-│ link
-│ manga
-│ mute
-│ online
-│ promote
-│ promoteall
-│ purge
-│ resetlink
-│ unmute
-└───────────────────────────────────────────────┘
+╭──❰ *GESTION DE GROUPE* ❱──╮
+│ ➤ _*add*_
+│ ➤ _*demote*_
+│ ➤ _*demoteall*_
+│ ➤ _*gpp*_
+│ ➤ _*kick*_
+│ ➤ _*kickall*_
+│ ➤ _*left*_
+│ ➤ _*link*_
+│ ➤ _*mute*_
+│ ➤ _*promote*_
+│ ➤ _*promoteall*_
+│ ➤ _*purge*_
+│ ➤ _*resetlink*_
+│ ➤ _*unmute*_
+╰────────────────────────────╯
 
-┌─────────────── TÉLÉCHARGEMENTS ───────────────┐
-│ apk
-│ down-url
-│ img
-│ save
-│ telegram-sticker
-│ tiktok
-│ toaudio
-│ url
-│ vv
-└───────────────────────────────────────────────┘
+╭──❰ *TÉLÉCHARGEMENTS* ❱──╮
+│ ➤ _*img*_
+│ ➤ _*save*_
+│ ➤ _*url*_
+│ ➤ _*vv*_
+╰────────────────────────────╯
 
-┌─────────────── UTILITAIRES ───────────────┐
-│ ai
-│ news
-│ weather
-│ checkban
-│ country
-│ delete
-│ device
-│ dico
-│ infos
-│ meteo
-│ ping
-│ owner
-└───────────────────────────────────────────────┘
+╭──❰ *UTILITAIRES* ❱──╮
+│ ➤ _*ping*_
+│ ➤ _*owner*_
+╰────────────────────────────╯
 
-┌─────────────── MODÉRATION ───────────────┐
-│ block
-│ unblock
-│ autorecording
-│ autotyping
-│ autoread
-│ autoreact
-│ welcome
-│ bye
-└───────────────────────────────────────────────┘
+╭──❰ *MODÉRATION* ❱──╮
+│ ➤ _*autorecording*_
+│ ➤ _*autotyping*_
+│ ➤ _*autoread*_
+│ ➤ _*autoreact*_
+│ ➤ _*welcome*_
+│ ➤ _*bye*_
+╰────────────────────────────╯
 
-┌─────────────── MEDIA ───────────────┐
-│ photo
-│ setpp
-│ take
-│ pp
-│ sticker
-└───────────────────────────────────────────────┘
+╭──❰ *MEDIA* ❱──╮
+│ ➤ _*photo*_
+│ ➤ _*setpp*_
+│ ➤ _*take*_
+│ ➤ _*pp*_
+│ ➤ _*sticker*_
+╰────────────────────────────╯
 
-┌─────────────── TAGS ───────────────┐
-│ principal
-│ tag
-│ tagadmin
-│ tagall
-└───────────────────────────────────────────────┘
+╭──❰ *TAGS* ❱──╮
+│ ➤ _*tag*_
+│ ➤ _*tagadmin*_
+│ ➤ _*tagall*_
+╰────────────────────────────╯
 
-┌─────────────────────────────┐
-│   *Développé par MR._SAMY TOUT MIGNON *     │
-└─────────────────────────────┘
+╭─❖───────────────────❖─╮
+     Développé par _*TAKAMURA*_
+╰─❖───────────────────❖─╯
 `;
 
     try {
       const imagePath = path.join("./assets/menu.jpg");
+      const audioPath = path.join("./lib/takamura.mp3");
 
       if (await fs.pathExists(imagePath)) {
         const imageBuffer = await fs.readFile(imagePath);
@@ -116,6 +92,15 @@ export default {
         });
       } else {
         await sock.sendMessage(from, { text: menuText });
+      }
+
+      if (await fs.pathExists(audioPath)) {
+        const audioBuffer = await fs.readFile(audioPath);
+        await sock.sendMessage(from, {
+          audio: audioBuffer,
+          mimetype: "audio/mp4",
+          ptt: true
+        });
       }
 
     } catch (e) {
