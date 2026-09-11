@@ -12,7 +12,8 @@ import {
   Browsers,
   fetchLatestBaileysVersion,
   makeCacheableSignalKeyStore,
-  delay
+  delay,
+  jidNormalizedUser
 } from "@whiskeysockets/baileys";
 
 // ──────────────────────────────────────────────────────────────
@@ -42,6 +43,26 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 const PAIRING_DIR = "./sessions";
 await fs.ensureDir(PAIRING_DIR);
 const bots = new Map();
+
+// Certaines commandes (ex: demoteall.js) s'attendent à trouver `global.bots`,
+// comme dans un bot mono-session, et l'interrogent avec un JID complet
+// (ex: "237xxx@s.whatsapp.net") alors que notre Map interne est indexée par
+// numéro brut ("237xxx"). Un Proxy permet à `global.bots.get(...)` d'accepter
+// les deux formats SANS toucher aux fichiers de commandes.
+global.bots = new Proxy(bots, {
+  get(target, prop, receiver) {
+    if (prop === "get") {
+      return (key) => {
+        if (typeof key === "string") {
+          const bare = formatNumber(key.split("@")[0]);
+          if (target.has(bare)) return target.get(bare);
+        }
+        return target.get(key);
+      };
+    }
+    return Reflect.get(target, prop, receiver);
+  }
+});
 
 // Nombre maximum de sessions (numéros) pouvant être enregistrées en même temps.
 const MAX_SESSIONS = 20;
@@ -162,6 +183,58 @@ async function loadCommands() {
   return commands;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Charge le LID (Linked ID) depuis le creds.json de la session
+// et l'ajoute à la liste des owners de ce bot, s'il n'y est pas
+// déjà. Contrairement à un bot mono-session, il n'y a pas de
+// config.json / jid.json globaux ici : chaque bot a son propre
+// objet `config` en mémoire (dans le Map `bots`), donc le LID
+// est stocké dans `bot.config.owners`.
+// ─────────────────────────────────────────────────────────────
+function loadLidFromSessionCreds(number, sessionDir) {
+  const credsPath = path.join(sessionDir, "creds.json");
+
+  try {
+    if (!fs.existsSync(credsPath)) {
+      console.log(chalk.yellow(`[LID] ${number} : fichier non trouvé (${credsPath})`));
+      return false;
+    }
+
+    const credsData = JSON.parse(fs.readFileSync(credsPath, "utf8"));
+
+    // Format attendu : "<lid>:<device>@lid"
+    const sessionLid = credsData?.me?.lid || "";
+    if (!sessionLid) {
+      console.log(chalk.yellow(`[LID] ${number} : aucun LID trouvé dans creds.json`));
+      return false;
+    }
+
+    const lidNumber = formatNumber(sessionLid.split(":")[0]);
+    if (!lidNumber) {
+      console.log(chalk.yellow(`[LID] ${number} : format de LID invalide dans creds.json`));
+      return false;
+    }
+
+    const bot = bots.get(number);
+    if (!bot) return false;
+
+    if (!bot.config.owners) bot.config.owners = [];
+
+    if (!bot.config.owners.includes(lidNumber)) {
+      bot.config.owners.push(lidNumber);
+      bot.ownerLid = lidNumber;
+      console.log(chalk.green(`[LID] ${lidNumber} ajouté aux owners de ${number}`));
+    } else {
+      console.log(chalk.gray(`[LID] ${lidNumber} déjà présent dans les owners de ${number}`));
+    }
+
+    return true;
+  } catch (e) {
+    console.log(chalk.red(`[LID] ${number} : ${e.message}`));
+    return false;
+  }
+}
+
 async function startBot(inputNumber) {
   const number = formatNumber(inputNumber);
   if (!number || number.length < 8) throw new Error("Numéro invalide");
@@ -212,7 +285,7 @@ async function startBot(inputNumber) {
   sock.ev.on("creds.update", saveCreds);
 
   const commands = await loadCommands();
-  const config = { prefix: ".", sudoList: [] };
+  const config = { prefix: ".", sudoList: [], owners: [] };
   const features = {
     autoread: false,
     autoreact: false,
@@ -252,7 +325,18 @@ async function startBot(inputNumber) {
       const quoted =
         msg.message?.extendedTextMessage?.contextInfo?.quotedMessage || null;
 
+      // Seul le numéro connecté (celui qui possède cette session) peut
+      // utiliser le bot : soit le message vient du compte lui-même
+      // (fromMe, cas normal en self-bot), soit l'expéditeur correspond
+      // exactement au numéro lié à cette session.
+      const senderNumber = formatNumber(String(participant).split("@")[0]);
+      const isOwner =
+        msg.key.fromMe ||
+        senderNumber === number ||
+        (bot.config.owners || []).includes(senderNumber);
+
       if (text && text.startsWith(bot.config.prefix)) {
+        if (!isOwner) return;
         const prefix = bot.config.prefix;
         const args = text.slice(prefix.length).trim().split(/\s+/);
         const cmdName = (args.shift() || "").toLowerCase();
@@ -271,6 +355,15 @@ async function startBot(inputNumber) {
 
         if (cmdName && bot.commands.has(cmdName)) {
           try {
+            // Compat pour les commandes écrites pour un bot mono-session :
+            // demoteall.js lit `global.owners`, promoteall.js lit
+            // `process.env.NUMBER`. On les repositionne sur CE numéro juste
+            // avant l'appel — synchrone, donc sans risque de collision avec
+            // une autre session malgré le multi-session (lecture faite avant
+            // le premier `await` dans ces commandes).
+            global.owners = bot.config.owners || [];
+            process.env.NUMBER = number;
+
             await bot.commands.get(cmdName).execute(
               sock,
               {
@@ -406,6 +499,19 @@ async function startBot(inputNumber) {
         // Seul ce point confirme une vraie liaison WhatsApp.
         if (bot) bot.linked = true;
         console.log(chalk.green(`[BOT] ${number} connecté`));
+
+        // Certaines commandes (kickall.js, purge.js) comparent directement
+        // `sock.user.id` (brut, avec suffixe d'appareil type ":20") aux JID
+        // des participants du groupe (sans suffixe). Sans normalisation,
+        // cette comparaison échoue TOUJOURS et le bot risque de tenter de
+        // s'auto-expulser. On normalise donc `sock.user.id` une bonne fois
+        // pour toutes ici, sans toucher aux fichiers de commandes.
+        if (sock.user?.id) {
+          sock.user.id = jidNormalizedUser(sock.user.id);
+        }
+
+        // Charge le LID depuis creds.json et l'ajoute aux owners du bot.
+        loadLidFromSessionCreds(number, SESSION_DIR);
 
         // Rejoint automatiquement le groupe et le canal configurés.
         autoJoinLinks(sock, number).catch(e =>
