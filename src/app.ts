@@ -12,6 +12,7 @@ import { SessionManager } from "./modules/whatsapp/session-manager.js";
 import { hashPassword, signAccessToken, verifyPassword, randomToken } from "./utils/security.js";
 import { requestId, requireAuth, requirePermission, csrf } from "./middleware/security.js";
 import { logger } from "./utils/logger.js";
+import { backupStore } from "./database/backup.js";
 
 export async function createApp() {
   await store.load();
@@ -33,10 +34,12 @@ export async function createApp() {
   app.post("/api/v1/sessions/:id/pair", requireAuth, requirePermission("sessions:create"), csrf, async (req, res) => { try { res.json({ data: await sessions.pair(String(req.params.id)) }); } catch { res.status(404).json({ error: "SESSION_NOT_FOUND" }); } });
   app.post("/api/v1/sessions/:id/disable", requireAuth, requirePermission("sessions:update"), csrf, async (req, res) => { try { res.json({ data: await sessions.disable(String(req.params.id)) }); } catch { res.status(404).json({ error: "SESSION_NOT_FOUND" }); } });
   app.delete("/api/v1/sessions/:id", requireAuth, requirePermission("sessions:delete"), csrf, async (req, res) => { await sessions.remove(String(req.params.id)); res.status(204).end(); });
-  app.get("/api/v1/commands", requireAuth, requirePermission("commands:read"), (_req, res) => res.json({ data: commands }));
+  app.get("/api/v1/commands", requireAuth, requirePermission("commands:read"), (_req, res) => res.json({ data: commands.map((command) => ({ ...command, ...(store.value.commandSettings[command.name] ?? {}) })) }));
+  app.patch("/api/v1/commands/:name", requireAuth, requirePermission("commands:update"), csrf, async (req, res) => { const command = commands.find((item) => item.name === String(req.params.name)); if (!command) return res.status(404).json({ error: "COMMAND_NOT_FOUND" }); const enabled = req.body?.enabled; if (typeof enabled !== "boolean") return res.status(400).json({ error: "INVALID_ENABLED" }); store.value.commandSettings[command.name] = { enabled, permissions: Array.isArray(req.body?.permissions) ? req.body.permissions.map(String) : command.permissions }; const log = { id: crypto.randomUUID(), action: "command.settings.updated", requestId: req.requestId, createdAt: new Date().toISOString(), metadata: { command: command.name, enabled } }; if (req.user?.id) Object.assign(log, { actorUserId: req.user.id }); store.value.logs.push(log); await store.save(); res.json({ data: { ...command, ...store.value.commandSettings[command.name] } }); });
   app.get("/api/v1/stats", requireAuth, requirePermission("dashboard:read"), (_req, res) => { const memory = process.memoryUsage(); res.json({ data: { bots: store.value.sessions.length, connected: store.value.sessions.filter((x) => x.state === "connected").length, commands: commands.length, users: store.value.users.length, queueDepth: 0, memory: { rss: memory.rss, heapUsed: memory.heapUsed, heapTotal: memory.heapTotal } } }); });
   app.get("/api/v1/logs", requireAuth, requirePermission("logs:read"), (req, res) => { const query = String(req.query.q ?? "").toLowerCase(); const action = String(req.query.action ?? ""); const rows = store.value.logs.filter((item) => (!query || JSON.stringify(item).toLowerCase().includes(query)) && (!action || item.action === action)).slice(-100).reverse(); if (req.query.format === "ndjson") return res.type("application/x-ndjson").send(rows.map((item) => JSON.stringify(item)).join("\n")); res.json({ data: rows }); });
   app.get("/metrics", requireAuth, requirePermission("logs:read"), (_req, res) => res.type("text/plain").send(`takamura_sessions_total ${store.value.sessions.length}\ntakamura_sessions_connected ${store.value.sessions.filter((x) => x.state === "connected").length}\ntakamura_commands_registered ${commands.length}\n`));
+  app.post("/api/v1/backup", requireAuth, requirePermission("logs:read"), csrf, async (_req, res) => { try { const file = await backupStore(); res.status(201).json({ data: { created: true, file: path.basename(file) } }); } catch { res.status(500).json({ error: "BACKUP_FAILED" }); } });
   app.use(express.static(path.resolve("public"), { index: "index.html" }));
   return { app, sessions };
 }

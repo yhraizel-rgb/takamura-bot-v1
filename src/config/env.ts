@@ -20,6 +20,8 @@ const schema = z.object({
 
 export const env = (() => {
   const parsed = schema.parse(process.env);
+  if (parsed.NODE_ENV === "production" && parsed.AUTH_MODE === "production" && parsed.JWT_SECRET.startsWith("development-only")) throw new Error("JWT_SECRET_MUST_BE_REPLACED_IN_PRODUCTION");
+  if (parsed.AUTH_MODE === "public" && parsed.NODE_ENV === "production") console.warn("[SECURITY] AUTH_MODE=public is a test-only configuration; enable AUTH_MODE=production before exposing this service.");
   return { ...parsed, runtimeDir: path.resolve(parsed.RUNTIME_DIR), corsOrigins: parsed.CORS_ORIGINS.split(",").map((x) => x.trim()).filter(Boolean) };
 })();
 

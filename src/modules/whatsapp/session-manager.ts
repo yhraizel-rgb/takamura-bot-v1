@@ -138,6 +138,8 @@ export class SessionManager {
         if (!message.key.fromMe && sender !== session.phoneNumber && !bot.config.owners.includes(sender)) return;
         const parts = text.slice(bot.config.prefix.length).trim().split(/\s+/); const name = (parts.shift() || "").toLowerCase();
         const command = bot.commands.get(name); if (!command) return;
+        const configured = store.value.commandSettings[name];
+        if (configured && !configured.enabled) return;
         const cooldownKey = `${id}:${sender}:${name}`; const now = Date.now(); const until = this.cooldowns.get(cooldownKey) ?? 0;
         if (until > now) return;
         this.cooldowns.set(cooldownKey, now + 1000);
