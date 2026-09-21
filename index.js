@@ -5,6 +5,8 @@ import pino from "pino";
 import bodyParser from "body-parser";
 import { fileURLToPath } from "url";
 import chalk from "chalk";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 import {
   makeWASocket,
@@ -33,11 +35,23 @@ const PORT = process.env.PORT || 80;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(__dirname));
+// Le frontend reste servi depuis la racine historique, mais les secrets,
+// sessions et fichiers source ne doivent jamais devenir des fichiers publics.
+app.use((req, res, next) => {
+  const pathname = decodeURIComponent(req.path);
+  if (/^\/(?:sessions|node_modules)(?:\/|$)/i.test(pathname) ||
+      /^\/(?:package(?:-lock)?\.json|index\.js|\.env|README\.md)$/i.test(pathname) ||
+      /^\/commands(?:\/|$)/i.test(pathname)) {
+    return res.status(404).end();
+  }
+  next();
+});
+app.use(express.static(__dirname, { index: false, dotfiles: "deny" }));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
 const PAIRING_DIR = "./sessions";
@@ -534,12 +548,15 @@ async function startBot(inputNumber) {
   return null;
 }
 
-app.get("/pair-api/code", async (req, res) => {
+const pairingLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: "draft-8", legacyHeaders: false, message: { error: "Trop de demandes de pairage. Réessayez plus tard." } });
+app.get("/pair-api/code", pairingLimiter, async (req, res) => {
   const { number } = req.query;
   if (!number) return res.json({ error: "Numéro requis" });
 
   try {
-    const code = await startBot(number);
+    const normalizedNumber = formatNumber(number);
+    if (normalizedNumber.length < 8 || normalizedNumber.length > 15) return res.json({ error: "Numéro invalide" });
+    const code = await startBot(normalizedNumber);
     if (code) return res.json({ code });
     return res.json({ status: "connected" });
   } catch (err) {
