@@ -3,13 +3,13 @@ import { z } from "zod";
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  AUTH_MODE: z.enum(["production", "test"]).default("production"),
   PORT: z.coerce.number().int().min(1).max(65535).default(8080),
   PUBLIC_ORIGIN: z.string().url().default("http://localhost:8080"),
   JWT_SECRET: z.string().min(32).default("development-only-secret-change-me-please-123456"),
   ACCESS_TOKEN_TTL: z.string().default("10m"),
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().min(1).max(365).default(30),
   RUNTIME_DIR: z.string().default("./runtime"),
-  DATABASE_URL: z.string().default("sqlite://./runtime/takamura.db"),
   FIRST_OWNER_EMAIL: z.string().email().optional(),
   FIRST_OWNER_PASSWORD: z.string().min(12).optional(),
   CORS_ORIGINS: z.string().default("http://localhost:8080"),

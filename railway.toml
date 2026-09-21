@@ -1,0 +1,17 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "./Dockerfile"
+
+[deploy]
+healthcheckPath = "/ready"
+healthcheckTimeout = 10
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+[env]
+NODE_ENV = "production"
+AUTH_MODE = "production"
+PORT = "8080"
+RUNTIME_DIR = "/app/runtime"
+METRICS_ENABLED = "false"
+AUTO_JOIN_ENABLED = "false"

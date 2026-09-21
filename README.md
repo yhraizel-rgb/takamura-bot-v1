@@ -22,11 +22,15 @@ npm run build
 npm audit
 ```
 
+## Railway sans SQL
+
+Le dépôt est déployable sur Railway avec un seul service Node.js et un Volume monté sur `/app/runtime`. Aucune base SQL n’est nécessaire : la persistance applicative utilise le store JSON atomique privé. Pour une recette sans login, définir `AUTH_MODE=test`; pour la version finale, définir `AUTH_MODE=production`, un `JWT_SECRET` aléatoire long et les variables `FIRST_OWNER_*`. Le guide complet est dans [`docs/RAILWAY.md`](docs/RAILWAY.md).
+
 ## Architecture
 
 `src/config` valide l’environnement ; `src/middleware` applique request ID, Helmet, CORS, auth, RBAC et CSRF ; `src/database` isole la persistance runtime ; `src/modules/whatsapp` centralise le cycle de vie des sessions ; `src/modules/commands` charge une fois le registre de compatibilité ; `public/` est l’unique webroot. Les credentials et fichiers runtime doivent rester dans un volume privé hors webroot.
 
-La persistance JSON livrée sert de store local de développement et de contrat de repository ; pour la production, remplacer l’adaptateur par SQLite/PostgreSQL/MySQL avec migrations transactionnelles et registre de sessions. Un seul worker doit posséder une session. Le scale-out exige affectation exclusive, bail transactionnel, secrets manager et partitionnement.
+La persistance JSON livrée est le store de recette et de production mono-worker ; le Volume Railway doit être sauvegardé. Un seul worker doit posséder une session. Le scale-out exige affectation exclusive, bail transactionnel, secrets manager et partitionnement.
 
 ## Décisions par défaut
 
