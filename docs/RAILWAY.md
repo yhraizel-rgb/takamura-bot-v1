@@ -15,7 +15,7 @@ PUBLIC_ORIGIN=https://<domaine-railway>
 CORS_ORIGINS=https://<domaine-railway>
 ```
 
-Le frontend obtient automatiquement un token de démonstration via `GET /api/v1/auth/demo`. Ce mode ne doit jamais être utilisé avec des comptes WhatsApp réels ou des données sensibles.
+Le frontend obtient automatiquement un token de démonstration via `GET /api/v1/auth/demo` et ouvre directement le dashboard sans afficher l’écran de login. Ce mode ne doit jamais être utilisé avec des comptes WhatsApp réels ou des données sensibles.
 
 ## Version finale prête à utiliser
 

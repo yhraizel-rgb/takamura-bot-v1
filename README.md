@@ -24,7 +24,7 @@ npm audit
 
 ## Railway sans SQL
 
-Le dépôt est déployable sur Railway avec un seul service Node.js et un Volume monté sur `/app/runtime`. Aucune base SQL n’est nécessaire : la persistance applicative utilise le store JSON atomique privé. Pour une recette sans login, définir `AUTH_MODE=test`; pour la version finale, définir `AUTH_MODE=production`, un `JWT_SECRET` aléatoire long et les variables `FIRST_OWNER_*`. Le guide complet est dans [`docs/RAILWAY.md`](docs/RAILWAY.md).
+Le dépôt est déployable sur Railway avec un seul service Node.js et un Volume monté sur `/app/runtime`. Aucune base SQL n’est nécessaire : la persistance applicative utilise le store JSON atomique privé. La configuration Railway incluse ouvre directement le dashboard en recette avec `AUTH_MODE=test`; pour la version finale, définir `AUTH_MODE=production`, un `JWT_SECRET` aléatoire long et les variables `FIRST_OWNER_*`. Le guide complet est dans [`docs/RAILWAY.md`](docs/RAILWAY.md).
 
 ## Architecture
 
