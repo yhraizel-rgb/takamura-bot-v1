@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const schema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  AUTH_MODE: z.enum(["production", "test"]).default("production"),
+  AUTH_MODE: z.enum(["production", "test", "public"]).default("production"),
   PORT: z.coerce.number().int().min(1).max(65535).default(8080),
   PUBLIC_ORIGIN: z.string().url().default("http://localhost:8080"),
   JWT_SECRET: z.string().min(32).default("development-only-secret-change-me-please-123456"),

@@ -10,7 +10,7 @@ restartPolicyMaxRetries = 5
 
 [env]
 NODE_ENV = "production"
-AUTH_MODE = "test"
+AUTH_MODE = "public"
 PORT = "8080"
 RUNTIME_DIR = "/app/runtime"
 METRICS_ENABLED = "false"
