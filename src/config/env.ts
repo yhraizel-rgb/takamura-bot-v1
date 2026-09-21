@@ -11,6 +11,7 @@ const schema = z.object({
   REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().min(1).max(365).default(30),
   RUNTIME_DIR: z.string().default("./runtime"),
   FIRST_OWNER_EMAIL: z.string().email().optional(),
+  FIRST_OWNER_USERNAME: z.string().min(3).max(64).optional(),
   FIRST_OWNER_PASSWORD: z.string().min(12).optional(),
   CORS_ORIGINS: z.string().default("http://localhost:8080"),
   METRICS_ENABLED: z.coerce.boolean().default(false),

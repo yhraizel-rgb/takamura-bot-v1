@@ -29,6 +29,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 26px 16px 20px; border-right: 1px solid var(--line); background: rgba(9,11,16,.78); backdrop-filter: blur(20px); }
 .brand { display: flex; align-items: center; gap: 10px; margin: 0 12px 38px; font-size: 17px; font-weight: 750; letter-spacing: -.04em; }
 .brand-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 11px; color: #fff; background: linear-gradient(145deg, var(--accent), #6d5df5); box-shadow: 0 8px 22px rgba(139,92,246,.35); font-size: 15px; }
+.menu-toggle { display: none; }
 .brand span { color: var(--accent); }
 .nav-label { padding: 0 12px 9px; color: var(--subtle); font-size: 10px; font-weight: 750; letter-spacing: .14em; text-transform: uppercase; }
 nav { display: grid; gap: 5px; }
@@ -38,6 +39,8 @@ nav button.active { border-color: rgba(167,139,250,.18); color: #fff; background
 .nav-icon { display: grid; place-items: center; width: 20px; color: currentColor; font-size: 15px; }
 .side-footer { margin-top: auto; padding: 14px 12px 0; color: var(--subtle); border-top: 1px solid var(--line); font-size: 11px; }
 .side-footer strong { display: block; margin-bottom: 3px; color: var(--muted); font-size: 12px; }
+.side-footer a { color: var(--accent); text-decoration: none; }
+.side-footer a:hover { text-decoration: underline; }
 .main { width: min(1380px, 100%); padding: 38px clamp(22px, 5vw, 76px) 70px; }
 .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 34px; }
 .eyebrow { display: flex; align-items: center; gap: 8px; color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
@@ -85,6 +88,6 @@ code { color: var(--cyan); font-size: 11px; }
 .amber { color: var(--amber) !important; }
 .login { width: min(420px, calc(100% - 32px)); margin: 14vh auto; }
 @media (max-width: 1100px) { .grid { grid-template-columns: repeat(3, minmax(0,1fr)); } }
-@media (max-width: 780px) { .shell { display: block; } .side { position: static; height: auto; padding: 17px 14px 12px; border-right: 0; border-bottom: 1px solid var(--line); } .brand { margin: 0 8px 18px; } .nav-label, .side-footer { display: none; } nav { display: flex; overflow-x: auto; padding-bottom: 2px; } nav button { width: auto; min-width: max-content; } .main { padding: 28px 16px 50px; } .top { display: block; margin-bottom: 26px; } .status { margin-top: 17px; } .grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; } .card { padding: 17px; border-radius: 15px; } .session-form { display: grid; align-items: stretch; } .section-head { display: grid; } }
+@media (max-width: 780px) { .shell { display: block; } .side { position: sticky; z-index: 10; top: 0; height: auto; padding: 14px; border-right: 0; border-bottom: 1px solid var(--line); } .brand { margin: 0 4px; } .menu-toggle { display: grid; gap: 4px; width: 32px; height: 32px; margin-right: 2px; padding: 7px; border: 1px solid var(--line-strong); border-radius: 9px; background: rgba(255,255,255,.04); cursor: pointer; } .menu-toggle i { display: block; height: 1.5px; border-radius: 2px; background: var(--text); transition: transform .18s ease, opacity .18s ease; } .menu-open .menu-toggle i:nth-child(1) { transform: translateY(5.5px) rotate(45deg); } .menu-open .menu-toggle i:nth-child(2) { opacity: 0; } .menu-open .menu-toggle i:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); } .nav-label, .side-footer { display: none; } nav { display: none; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); } .menu-open nav { display: grid; } nav button { width: 100%; } .main { padding: 28px 16px 50px; } .top { display: block; margin-bottom: 26px; } .status { margin-top: 17px; } .grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; } .card { padding: 17px; border-radius: 15px; } .session-form { display: grid; align-items: stretch; } .section-head { display: grid; } }
 @media (max-width: 430px) { .grid { grid-template-columns: 1fr 1fr; } .metric { font-size: 24px; } .label { font-size: 10px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
